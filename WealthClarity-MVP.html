@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wealth Clarity</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Georgia, serif;
+      background: #0f0f0f;
+      color: #f0ece4;
+      padding: 20px;
+    }
+    .container { max-width: 680px; margin: 0 auto; }
+    h1 { font-size: 2rem; text-align: center; margin-bottom: 2rem; }
+    h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+    .card {
+      background: #141414;
+      border: 1px solid #1e1e1e;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    label { font-size: 0.8rem; display: block; margin-bottom: 0.3rem; color: #999; }
+    input, select {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 0.8rem;
+      border-radius: 6px;
+      border: 1px solid #1e1e1e;
+      background: #0a0a0a;
+      color: #f0ece4;
+      font-family: Georgia, serif;
+      font-size: 1rem;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #E8A87C;
+      box-shadow: 0 0 0 3px rgba(232,168,124,0.1);
+    }
+    .btn {
+      background: #E8A87C;
+      color: #0f0f0f;
+      border: none;
+      border-radius: 6px;
+      padding: 0.8rem 1.4rem;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: Georgia, serif;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .btn:hover { opacity: 0.95; }
+    .btn.delete { background: #555; color: #fff; }
+    .entry-item {
+      padding: 1rem;
+      border: 1px solid #1e1e1e;
+      margin-bottom: 0.8rem;
+      border-radius: 8px;
+      background: #0a0a0a;
+    }
+    .entry-description { font-weight: bold; font-size: 1.1rem; margin-bottom: 0.3rem; }
+    .entry-meta { font-size: 0.9rem; color: #999; margin-bottom: 0.8rem; }
+    .entry-amount { color: #E8A87C; font-weight: bold; font-size: 1.2rem; margin-bottom: 0.8rem; }
+    .edit-form {
+      padding: 1rem;
+      border: 2px solid #E8A87C;
+      margin-bottom: 0.8rem;
+      border-radius: 8px;
+      background: #1a1a1a;
+    }
+    .edit-form h3 { margin-bottom: 1rem; font-size: 1rem; }
+    .no-entries { text-align: center; padding: 2rem; color: #666; font-style: italic; }
+    .row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Wealth Clarity</h1>
+
+    <div class="card" aria-labelledby="add-entry-heading">
+      <h2 id="add-entry-heading">Add Entry</h2>
+
+      <label for="desc">Description</label>
+      <input type="text" id="desc" placeholder="What did you spend on?" />
+
+      <label for="amount">Amount</label>
+      <input type="number" id="amount" placeholder="Amount" min="0" step="0.01" />
+
+      <label for="category">Category</label>
+      <select id="category">
+        <optgroup label="Spending">
+          <option value="food">Food & Dining</option>
+          <option value="transport">Transport</option>
+          <option value="housing">Housing</option>
+          <option value="health">Health</option>
+          <option value="education">Education</option>
+          <option value="childcare">Childcare</option>
+          <option value="entertainment">Entertainment</option>
+          <option value="shopping">Shopping</option>
+          <option value="subscriptions">Subscriptions</option>
+          <option value="utilities">Utilities</option>
+          <option value="other">Other</option>
+        </optgroup>
+        <optgroup label="Building Wealth">
+          <option value="savings">Savings</option>
+          <option value="investments">Investments</option>
+          <option value="emergency">Emergency Fund</option>
+          <option value="giving">Giving & Charity</option>
+        </optgroup>
+      </select>
+
+      <label for="date">Date</label>
+      <input type="date" id="date" />
+
+      <div class="row">
+        <button class="btn" id="addBtn">+ Add Entry</button>
+        <button class="btn" id="clearBtn" style="background:#666;color:#fff;">Clear All</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Entries</h2>
+      <div id="entries" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <script>
+    // Categories with icons and labels
+    const CATEGORIES = {
+      food: { icon: '🍽️', label: 'Food & Dining' },
+      transport: { icon: '🚗', label: 'Transport' },
+      housing: { icon: '🏠', label: 'Housing' },
+      health: { icon: '💊', label: 'Health' },
+      education: { icon: '🎓', label: 'Education' },
+      childcare: { icon: '👶', label: 'Childcare' },
+      entertainment: { icon: '🎬', label: 'Entertainment' },
+      shopping: { icon: '🛍️', label: 'Shopping' },
+      subscriptions: { icon: '🔁', label: 'Subscriptions' },
+      utilities: { icon: '💡', label: 'Utilities' },
+      savings: { icon: '💰', label: 'Savings' },
+      investments: { icon: '📈', label: 'Investments' },
+      emergency: { icon: '🛟', label: 'Emergency Fund' },
+      giving: { icon: '🎁', label: 'Giving & Charity' },
+      other: { icon: '🔸', label: 'Other' }
+    };
+
+    // Storage key
+    const STORAGE_KEY = 'el_e';
+
+    // Load entries from localStorage (safe parse)
+    function loadEntries() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error('Failed to parse entries from storage', e);
+        return [];
+      }
+    }
+
+    function saveEntries(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    let entries = loadEntries();
+    let editingId = null;
+
+    // Utility: format date (YYYY-MM-DD -> readable)
+    function formatDate(iso) {
+      if (!iso) return '';
+      return iso;
+    }
+
+    // Add entry
+    function addEntry() {
+      const descEl = document.getElementById('desc');
+      const amountEl = document.getElementById('amount');
+      const categoryEl = document.getElementById('category');
+      const dateEl = document.getElementById('date');
+
+      const desc = descEl.value.trim();
+      const amount = parseFloat(amountEl.value);
+      const category = categoryEl.value;
+      const date = dateEl.value;
+
+      if (!desc) {
+        alert('Please enter a description');
+        descEl.focus();
+        return;
+      }
+      if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid amount');
+        amountEl.focus();
+        return;
+      }
+      if (!date) {
+        alert('Please select a date');
+        dateEl.focus();
+        return;
+      }
+
+      const entry = {
+        id: Date.now(),
+        desc,
+        amount,
+        category,
+        date
+      };
+
+      entries.unshift(entry);
+      saveEntries(entries);
+
+      // reset form
+      descEl.value = '';
+      amountEl.value = '';
+      categoryEl.value = 'food';
+      dateEl.valueAsDate = new Date();
+
+      render();
+    }
+
+    // Start editing an entry
+    function startEdit(id) {
+      editingId = id;
+      render();
+    }
+
+    function cancelEdit() {
+      editingId = null;
+      render();
+    }
+
+    function saveEdit(id) {
+      const newDesc = document.getElementById(`edit_desc_${id}`).value.trim();
+      const newAmount = parseFloat(document.getElementById(`edit_amount_${id}`).value);
+      const newCategory = document.getElementById(`edit_cat_${id}`).value;
+      const newDate = document.getElementById(`edit_date_${id}`).value;
+
+      if (!newDesc || isNaN(newAmount) || newAmount <= 0 || !newDate) {
+        alert('Please fill in all fields with valid values');
+        return;
+      }
+
+      entries = entries.map(e => e.id === id ? { id, desc: newDesc, amount: newAmount, category: newCategory, date: newDate } : e);
+      saveEntries(entries);
+      editingId = null;
+      render();
+    }
+
+    function deleteEntry(id) {
+      if (!confirm('Delete this entry?')) return;
+      entries = entries.filter(e => e.id !== id);
+      saveEntries(entries);
+      render();
+    }
+
+    function clearAll() {
+      if (!confirm('Clear all entries?')) return;
+      entries = [];
+      saveEntries(entries);
+      render();
+    }
+
+    // Render entries
+    function render() {
+      const container = document.getElementById('entries');
+      if (!entries.length) {
+        container.innerHTML = '<div class="no-entries">No entries yet. Add one above!</div>';
+        return;
+      }
+
+      const html = entries.map(e => {
+        const cat = CATEGORIES[e.category] || { icon: '', label: e.category || 'Unknown' };
+
+        if (editingId === e.id) {
+          return `
+            <div class="edit-form" role="region" aria-label="Edit entry ${e.desc}">
+              <h3>Editing: ${cat.icon} ${escapeHtml(e.desc)}</h3>
+              <label>Description</label>
+              <input type="text" id="edit_desc_${e.id}" value="${escapeHtml(e.desc)}" />
+              <label>Amount</label>
+              <input type="number" id="edit_amount_${e.id}" value="${e.amount}" />
+              <label>Category</label>
+              <select id="edit_cat_${e.id}">
+                ${Object.keys(CATEGORIES).map(k => `<option value="${k}" ${e.category === k ? 'selected' : ''}>${CATEGORIES[k].label}</option>`).join('')}
+              </select>
+              <label>Date</label>
+              <input type="date" id="edit_date_${e.id}" value="${e.date}" />
+              <div style="margin-top:1rem;">
+                <button class="btn" onclick="saveEdit(${e.id})">Save</button>
+                <button class="btn" style="background:#666;color:#fff;" onclick="cancelEdit()">Cancel</button>
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="entry-item" role="article" aria-label="${escapeHtml(e.desc)}">
+            <div class="entry-description">${cat.icon} ${escapeHtml(e.desc)}</div>
+            <div class="entry-meta">${escapeHtml(cat.label)} · ${escapeHtml(formatDate(e.date))}</div>
+            <div class="entry-amount">$${Number(e.amount).toFixed(2)}</div>
+            <div>
+              <button class="btn" onclick="startEdit(${e.id})">Edit</button>
+              <button class="btn delete" onclick="deleteEntry(${e.id})">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = html;
+    }
+
+    // Small helper to avoid injecting raw HTML from user input
+    function escapeHtml(str) {
+      if (typeof str !== 'string') return '';
+      return str.replace(/[&<>"']/g, function (m) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+      });
+    }
+
+    // Initialize
+    document.getElementById('date').valueAsDate = new Date();
+    document.getElementById('addBtn').addEventListener('click', addEntry);
+    document.getElementById('clearBtn').addEventListener('click', clearAll);
+
+    render();
+  </script>
+</body>
+</html>
