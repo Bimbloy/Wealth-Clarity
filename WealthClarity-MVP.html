@@ -65,6 +65,8 @@
       color: #f0ece4;
       font-family: Georgia, serif;
       font-size: 1rem;
+      -webkit-appearance: none;
+      appearance: none;
     }
     
     input:focus, select:focus {
@@ -84,6 +86,9 @@
       font-family: Georgia, serif;
       margin-right: 0.5rem;
       margin-bottom: 0.5rem;
+      -webkit-appearance: none;
+      appearance: none;
+      font-size: 1rem;
     }
     
     .btn:hover { 
@@ -104,6 +109,8 @@
       font-size: 0.9rem;
       transition: all 0.2s;
       font-family: Georgia, serif;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     .mood-btn:hover {
@@ -134,6 +141,8 @@
       transition: all 0.2s;
       font-family: Georgia, serif;
       border: none;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     .filter-pill:hover {
@@ -180,6 +189,27 @@
       font-weight: bold;
       color: #E8A87C;
     }
+
+    .projection-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #333;
+      font-size: 0.95rem;
+    }
+
+    .projection-row:last-child {
+      border-bottom: none;
+    }
+
+    .projection-label {
+      color: #999;
+    }
+
+    .projection-value {
+      color: #4CAF50;
+      font-weight: bold;
+    }
     
     .entry-item {
       padding: 1rem;
@@ -212,6 +242,15 @@
       font-size: 0.9rem;
       color: #999;
       margin-bottom: 0.8rem;
+    }
+
+    .entry-projection {
+      font-size: 0.85rem;
+      color: #4CAF50;
+      margin-bottom: 0.8rem;
+      padding: 0.6rem;
+      background: #0f3b1f;
+      border-radius: 4px;
     }
     
     .edit-form {
@@ -258,6 +297,8 @@
       font-size: 1rem;
       border-bottom: 2px solid transparent;
       transition: all 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     .tab-btn:hover {
@@ -276,11 +317,161 @@
     .tab-content.active {
       display: block;
     }
+
+    /* Modal styles - FIXED FOR MOBILE */
+    .modal {
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex !important;
+    }
+
+    .modal-content {
+      background: #141414;
+      border: 1px solid #E8A87C;
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      width: 90%;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 1rem;
+      color: #E8A87C;
+    }
+
+    .modal-content p {
+      margin-bottom: 1rem;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .modal-buttons .btn {
+      flex: 1;
+      text-align: center;
+      margin: 0;
+    }
+
+    .advisor-section {
+      background: #1a1a1a;
+      border: 2px solid #E8A87C;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .advisor-section h3 {
+      margin-bottom: 1rem;
+      color: #E8A87C;
+    }
+
+    .advisor-section p {
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .advisor-link {
+      color: #E8A87C;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .advisor-link:hover {
+      opacity: 0.8;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      
+      .card {
+        padding: 1rem;
+      }
+      
+      .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+        margin-right: 0;
+      }
+      
+      .mood-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- Disclaimer Modal -->
+  <div id="disclaimerModal" class="modal">
+    <div class="modal-content">
+      <h2>⚠️ Important Disclaimer</h2>
+      <p><strong>Wealth Clarity</strong> is an educational tool designed to help you understand your spending and visualize potential long-term wealth growth. It is NOT financial advice.</p>
+      <p>✓ Investment projections are illustrative only, based on historical market averages.</p>
+      <p>✓ Actual returns may vary. Past performance does not guarantee future results.</p>
+      <p>✓ Always consult with a qualified financial advisor before making investment decisions.</p>
+      <p>✓ Your data is stored locally on this device. We do not collect or transmit your personal information.</p>
+      <div class="modal-buttons">
+        <button class="btn" onclick="acceptDisclaimer()">I Understand</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advisor Disclaimer Modal -->
+  <div id="advisorDisclaimerModal" class="modal">
+    <div class="modal-content">
+      <h2>About Your Advisor</h2>
+      <p><strong>Wealth Clarity does NOT endorse any financial advisor.</strong></p>
+      <p>The advisor information shown is for reference only. Before working with any advisor:</p>
+      <p>✓ Verify their credentials and licensing</p>
+      <p>✓ Review their fee structure</p>
+      <p>✓ Check their background and experience</p>
+      <p>✓ Ensure they are a fiduciary (required to act in your best interest)</p>
+      <p>Wealth Clarity assumes no liability for any advisor relationship or outcomes.</p>
+      <div class="modal-buttons">
+        <button class="btn" onclick="closeAdvisorModal()">I Understand</button>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <h1>Wealth Clarity</h1>
+    
+    <div class="card">
+      <h2>Settings</h2>
+      
+      <label>Currency</label>
+      <select id="currency" onchange="setCurrency(this.value)">
+        <option value="usd">🇺🇸 USD (United States)</option>
+        <option value="cad">🇨🇦 CAD (Canada)</option>
+        <option value="gbp">🇬🇧 GBP (UK)</option>
+        <option value="aud">🇦🇺 AUD (Australia)</option>
+      </select>
+
+      <label>Hourly Wage (for context)</label>
+      <input type="number" id="wage" placeholder="Your hourly wage (optional)" min="0" step="0.01" onchange="saveWage()">
+    </div>
     
     <div class="card">
       <h2>Add Entry</h2>
@@ -319,15 +510,23 @@
       
       <label>How did this feel?</label>
       <div class="mood-buttons-row">
-        <button type="button" class="mood-btn" data-mood="great" onclick="setMood('great', this)">🥰 Worth every penny</button>
-        <button type="button" class="mood-btn" data-mood="good" onclick="setMood('good', this)">😊 Good call</button>
-        <button type="button" class="mood-btn" data-mood="neutral" onclick="setMood('neutral', this)">😐 It is what it is</button>
-        <button type="button" class="mood-btn" data-mood="regret" onclick="setMood('regret', this)">🤔 Second thoughts</button>
-        <button type="button" class="mood-btn" data-mood="bad" onclick="setMood('bad', this)">🔄 Could do better</button>
+        <button type="button" class="mood-btn" data-mood="great" onclick="setMood('great', this)">🥰 Worth it</button>
+        <button type="button" class="mood-btn" data-mood="good" onclick="setMood('good', this)">😊 Good</button>
+        <button type="button" class="mood-btn" data-mood="neutral" onclick="setMood('neutral', this)">😐 Neutral</button>
+        <button type="button" class="mood-btn" data-mood="regret" onclick="setMood('regret', this)">🤔 Regret</button>
+        <button type="button" class="mood-btn" data-mood="bad" onclick="setMood('bad', this)">🔄 Bad</button>
       </div>
       <input type="hidden" id="mood" value="">
       
       <button class="btn" onclick="addEntry()">+ Add Entry</button>
+    </div>
+
+    <!-- Advisor Section -->
+    <div class="advisor-section">
+      <h3>💬 Need a Financial Advisor?</h3>
+      <p>Consider speaking with <span class="advisor-link" onclick="openAdvisorModal()"><strong>Adeola Monofi</strong></span></p>
+      <button class="btn" onclick="scheduleCall()">📅 Schedule a Call</button>
+      <button class="btn" style="background: #666;" onclick="shareWithAdvisor()">📤 Share</button>
     </div>
 
     <div class="card">
@@ -341,12 +540,12 @@
         <h2>Filter by Mood</h2>
         <div class="filter-section">
           <div class="filter-pills">
-            <button class="filter-pill" onclick="filterByMood(null)">All Entries</button>
-            <button class="filter-pill" onclick="filterByMood('great')">🥰 Worth it</button>
-            <button class="filter-pill" onclick="filterByMood('good')">😊 Good</button>
-            <button class="filter-pill" onclick="filterByMood('neutral')">😐 Neutral</button>
-            <button class="filter-pill" onclick="filterByMood('regret')">🤔 Regret</button>
-            <button class="filter-pill" onclick="filterByMood('bad')">🔄 Bad</button>
+            <button class="filter-pill active" onclick="filterByMood(null)">All</button>
+            <button class="filter-pill" onclick="filterByMood('great')">🥰</button>
+            <button class="filter-pill" onclick="filterByMood('good')">😊</button>
+            <button class="filter-pill" onclick="filterByMood('neutral')">😐</button>
+            <button class="filter-pill" onclick="filterByMood('regret')">🤔</button>
+            <button class="filter-pill" onclick="filterByMood('bad')">🔄</button>
           </div>
         </div>
 
@@ -356,6 +555,11 @@
 
       <!-- INSIGHTS TAB -->
       <div id="insights" class="tab-content">
+        <h2>What If You Invested It?</h2>
+        <div class="insights-card">
+          <div id="investmentInsights"></div>
+        </div>
+
         <h2>Mood Breakdown</h2>
         <div class="insights-card">
           <div id="moodInsights"></div>
@@ -372,20 +576,30 @@
             <div class="insight-value" id="totalSpent">$0.00</div>
           </div>
           <div class="insight-row">
-            <div class="insight-label">Average per Entry</div>
+            <div class="insight-label">Average Entry</div>
             <div class="insight-value" id="averageEntry">$0.00</div>
           </div>
           <div class="insight-row">
-            <div class="insight-label">Regret Ratio</div>
-            <div class="insight-value" id="regretRatio">0%</div>
+            <div class="insight-label">Hours of Work</div>
+            <div class="insight-value" id="hoursOfWork">—</div>
           </div>
         </div>
+
+        <button class="btn" onclick="exportCSV()">📥 Download CSV</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Category mapping
+    // Market data
+    const MARKET_DATA = {
+      usd: { symbol: '$', rate: 0.07 },
+      cad: { symbol: '$', rate: 0.065 },
+      gbp: { symbol: '£', rate: 0.055 },
+      aud: { symbol: '$', rate: 0.07 }
+    };
+
+    // Categories
     const CATEGORIES = {
       food: { icon: '🍽️', label: 'Food & Dining' },
       transport: { icon: '🚗', label: 'Transport' },
@@ -404,7 +618,7 @@
       other: { icon: '📦', label: 'Other' }
     };
 
-    // Mood mapping
+    // Moods
     const MOOD_NAMES = {
       great: '🥰 Worth every penny',
       good: '😊 Good call',
@@ -413,64 +627,123 @@
       bad: '🔄 Could do better'
     };
 
-    // Data storage
+    // Data
     let entries = JSON.parse(localStorage.getItem('el_e') || '[]');
+    let currentCurrency = localStorage.getItem('el_c') || 'usd';
+    let currentWage = parseFloat(localStorage.getItem('el_w') || '0');
     let editingId = null;
     let currentMoodFilter = null;
 
-    // Switch tabs
+    // Initialize
+    document.getElementById('currency').value = currentCurrency;
+    if (currentWage > 0) {
+      document.getElementById('wage').value = currentWage;
+    }
+    document.getElementById('date').valueAsDate = new Date();
+
+    // Check disclaimer on load
+    window.addEventListener('load', function() {
+      checkDisclaimer();
+      render();
+    });
+
+    function checkDisclaimer() {
+      const accepted = localStorage.getItem('el_disclaimer') === 'true';
+      if (!accepted) {
+        document.getElementById('disclaimerModal').classList.add('show');
+      }
+    }
+
+    function acceptDisclaimer() {
+      localStorage.setItem('el_disclaimer', 'true');
+      document.getElementById('disclaimerModal').classList.remove('show');
+    }
+
+    function openAdvisorModal() {
+      document.getElementById('advisorDisclaimerModal').classList.add('show');
+    }
+
+    function closeAdvisorModal() {
+      document.getElementById('advisorDisclaimerModal').classList.remove('show');
+    }
+
+    function scheduleCall() {
+      const url = 'https://www.adeolamonofi.com/schedule-financial-advisory-call';
+      window.location.href = url;
+    }
+
+    function shareWithAdvisor() {
+      const totalSpent = entries.reduce((sum, e) => sum + e.amount, 0);
+      const summary = entries.map(e => `${e.desc}: ${MARKET_DATA[currentCurrency].symbol}${e.amount.toFixed(2)}`).join('\n');
+      
+      const emailBody = `Hi Adeola,%0A%0AHere's my spending summary:%0A%0ATotal: ${MARKET_DATA[currentCurrency].symbol}${totalSpent.toFixed(2)}%0A%0A${summary.replace(/\n/g, '%0A')}`;
+      
+      const mailtoLink = `mailto:hello@adeolamonofi.com?subject=Wealth%20Clarity%20Summary&body=${emailBody}`;
+      window.location.href = mailtoLink;
+    }
+
+    function setCurrency(curr) {
+      currentCurrency = curr;
+      localStorage.setItem('el_c', curr);
+      render();
+      renderInsights();
+    }
+
+    function saveWage() {
+      const wage = parseFloat(document.getElementById('wage').value) || 0;
+      currentWage = wage;
+      localStorage.setItem('el_w', wage);
+      renderInsights();
+    }
+
+    function calculateProjection(amount) {
+      const rate = MARKET_DATA[currentCurrency].rate;
+      const year5 = amount * Math.pow(1 + rate, 5);
+      const year10 = amount * Math.pow(1 + rate, 10);
+      return { year5, year10 };
+    }
+
     function switchTab(tab) {
-      // Hide all tabs
       document.getElementById('log').classList.remove('active');
       document.getElementById('insights').classList.remove('active');
-
-      // Remove active from all tab buttons
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-
-      // Show selected tab and mark button active
+      
       document.getElementById(tab).classList.add('active');
       event.target.classList.add('active');
 
-      // Render insights if switching to insights tab
       if (tab === 'insights') {
         renderInsights();
       }
     }
 
-    // Filter by mood
     function filterByMood(mood) {
       currentMoodFilter = mood;
-      
-      // Update active state on filter pills
-      document.querySelectorAll('.filter-pill').forEach(pill => {
-        pill.classList.remove('active');
-      });
+      document.querySelectorAll('.filter-pill').forEach(pill => pill.classList.remove('active'));
       
       if (mood === null) {
         document.querySelectorAll('.filter-pill')[0].classList.add('active');
       } else {
         const pillIndex = ['great', 'good', 'neutral', 'regret', 'bad'].indexOf(mood) + 1;
-        document.querySelectorAll('.filter-pill')[pillIndex].classList.add('active');
+        if (document.querySelectorAll('.filter-pill')[pillIndex]) {
+          document.querySelectorAll('.filter-pill')[pillIndex].classList.add('active');
+        }
       }
       
       render();
     }
 
-    // Set mood on add entry form
     function setMood(moodValue, buttonElement) {
       document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('selected'));
       buttonElement.classList.add('selected');
       document.getElementById('mood').value = moodValue;
     }
 
-    // Set mood on edit form
     function setMoodEdit(entryId, moodValue, buttonElement) {
       document.querySelectorAll(`#moodButtons_${entryId} .mood-btn`).forEach(btn => btn.classList.remove('selected'));
       buttonElement.classList.add('selected');
       document.getElementById(`edit_mood_${entryId}`).value = moodValue;
     }
 
-    // Add new entry
     function addEntry() {
       const desc = document.getElementById('desc').value.trim();
       const amount = parseFloat(document.getElementById('amount').value);
@@ -494,11 +767,10 @@
       }
 
       if (!mood) {
-        alert('Please select how you felt about this');
+        alert('Please select a mood');
         return;
       }
 
-      // Add to entries
       entries.unshift({ 
         id: Date.now(), 
         desc, 
@@ -508,10 +780,9 @@
         mood
       });
 
-      // Save to localStorage
       localStorage.setItem('el_e', JSON.stringify(entries));
       
-      // Clear form
+      // CLEAR FORM
       document.getElementById('desc').value = '';
       document.getElementById('amount').value = '';
       document.getElementById('category').value = 'food';
@@ -519,16 +790,13 @@
       document.getElementById('mood').value = '';
       document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('selected'));
       
-      // Re-render
       render();
     }
 
-    // Start editing an entry
     function startEdit(id) {
       editingId = id;
       render();
       
-      // Select the mood button after render
       setTimeout(() => {
         const entry = entries.find(e => e.id === id);
         if (entry && entry.mood) {
@@ -537,16 +805,14 @@
             moodBtn.classList.add('selected');
           }
         }
-      }, 0);
+      }, 100);
     }
 
-    // Cancel editing
     function cancelEdit() {
       editingId = null;
       render();
     }
 
-    // Save edited entry
     function saveEdit(id) {
       const newDesc = document.getElementById(`edit_desc_${id}`).value.trim();
       const newAmount = parseFloat(document.getElementById(`edit_amount_${id}`).value);
@@ -554,30 +820,22 @@
       const newDate = document.getElementById(`edit_date_${id}`).value;
       const newMood = document.getElementById(`edit_mood_${id}`).value;
 
-      if (!newDesc || !newAmount || !newDate) {
-        alert('Please fill in all fields');
+      if (!newDesc || !newAmount || !newDate || !newMood) {
+        alert('Please fill all fields');
         return;
       }
 
-      if (!newMood) {
-        alert('Please select a mood');
-        return;
-      }
-
-      // Update entry
       entries = entries.map(e => 
         e.id === id 
           ? { id, desc: newDesc, amount: newAmount, category: newCategory, date: newDate, mood: newMood }
           : e
       );
 
-      // Save and re-render
       localStorage.setItem('el_e', JSON.stringify(entries));
       editingId = null;
       render();
     }
 
-    // Delete an entry
     function deleteEntry(id) {
       if (confirm('Delete this entry?')) {
         entries = entries.filter(e => e.id !== id);
@@ -586,148 +844,137 @@
       }
     }
 
-    // Get filtered entries
     function getFilteredEntries() {
-      if (currentMoodFilter === null) {
-        return entries;
-      }
+      if (currentMoodFilter === null) return entries;
       return entries.filter(e => e.mood === currentMoodFilter);
     }
 
-    // Render entries (with filtering)
     function render() {
-      const filteredEntries = getFilteredEntries();
+      const filtered = getFilteredEntries();
+      const symbol = MARKET_DATA[currentCurrency].symbol;
       
-      const html = filteredEntries.map(e => {
+      const html = filtered.map(e => {
         const cat = CATEGORIES[e.category];
-        const moodLabel = MOOD_NAMES[e.mood] || '❓ Not rated';
+        const moodLabel = MOOD_NAMES[e.mood] || '?';
+        const proj = calculateProjection(e.amount);
 
-        // Edit mode
         if (editingId === e.id) {
           return `
             <div class="edit-form">
               <h3>Editing: ${cat.icon} ${e.desc}</h3>
-              
               <label>Description</label>
               <input type="text" id="edit_desc_${e.id}" value="${e.desc}">
-              
               <label>Amount</label>
               <input type="number" id="edit_amount_${e.id}" value="${e.amount}">
-              
               <label>Category</label>
               <select id="edit_cat_${e.id}">
-                <optgroup label="💰 Spending">
-                  <option value="food" ${e.category === 'food' ? 'selected' : ''}>🍽️ Food & Dining</option>
-                  <option value="transport" ${e.category === 'transport' ? 'selected' : ''}>🚗 Transport</option>
-                  <option value="housing" ${e.category === 'housing' ? 'selected' : ''}>🏠 Housing</option>
-                  <option value="health" ${e.category === 'health' ? 'selected' : ''}>💊 Health</option>
-                  <option value="education" ${e.category === 'education' ? 'selected' : ''}>📚 Education</option>
-                  <option value="childcare" ${e.category === 'childcare' ? 'selected' : ''}>👶 Childcare</option>
-                  <option value="entertainment" ${e.category === 'entertainment' ? 'selected' : ''}>🎬 Entertainment</option>
-                  <option value="shopping" ${e.category === 'shopping' ? 'selected' : ''}>🛍️ Shopping</option>
-                  <option value="subscriptions" ${e.category === 'subscriptions' ? 'selected' : ''}>🔄 Subscriptions</option>
-                  <option value="utilities" ${e.category === 'utilities' ? 'selected' : ''}>⚡ Utilities</option>
-                  <option value="other" ${e.category === 'other' ? 'selected' : ''}>📦 Other</option>
-                </optgroup>
-                <optgroup label="🌱 Building Wealth">
-                  <option value="savings" ${e.category === 'savings' ? 'selected' : ''}>🏦 Savings</option>
-                  <option value="investments" ${e.category === 'investments' ? 'selected' : ''}>📈 Investments</option>
-                  <option value="emergency" ${e.category === 'emergency' ? 'selected' : ''}>🛡️ Emergency Fund</option>
-                  <option value="giving" ${e.category === 'giving' ? 'selected' : ''}>🤝 Giving & Charity</option>
-                </optgroup>
+                <option value="food" ${e.category === 'food' ? 'selected' : ''}>Food</option>
+                <option value="transport" ${e.category === 'transport' ? 'selected' : ''}>Transport</option>
+                <option value="housing" ${e.category === 'housing' ? 'selected' : ''}>Housing</option>
+                <option value="health" ${e.category === 'health' ? 'selected' : ''}>Health</option>
+                <option value="education" ${e.category === 'education' ? 'selected' : ''}>Education</option>
+                <option value="childcare" ${e.category === 'childcare' ? 'selected' : ''}>Childcare</option>
+                <option value="entertainment" ${e.category === 'entertainment' ? 'selected' : ''}>Entertainment</option>
+                <option value="shopping" ${e.category === 'shopping' ? 'selected' : ''}>Shopping</option>
+                <option value="subscriptions" ${e.category === 'subscriptions' ? 'selected' : ''}>Subscriptions</option>
+                <option value="utilities" ${e.category === 'utilities' ? 'selected' : ''}>Utilities</option>
+                <option value="savings" ${e.category === 'savings' ? 'selected' : ''}>Savings</option>
+                <option value="investments" ${e.category === 'investments' ? 'selected' : ''}>Investments</option>
+                <option value="emergency" ${e.category === 'emergency' ? 'selected' : ''}>Emergency Fund</option>
+                <option value="giving" ${e.category === 'giving' ? 'selected' : ''}>Giving</option>
+                <option value="other" ${e.category === 'other' ? 'selected' : ''}>Other</option>
               </select>
-              
               <label>Date</label>
               <input type="date" id="edit_date_${e.id}" value="${e.date}">
-              
               <label>Mood</label>
               <div class="mood-buttons-row" id="moodButtons_${e.id}">
-                <button type="button" class="mood-btn" data-mood="great" onclick="setMoodEdit(${e.id}, 'great', this)">🥰 Worth every penny</button>
-                <button type="button" class="mood-btn" data-mood="good" onclick="setMoodEdit(${e.id}, 'good', this)">😊 Good call</button>
-                <button type="button" class="mood-btn" data-mood="neutral" onclick="setMoodEdit(${e.id}, 'neutral', this)">😐 It is what it is</button>
-                <button type="button" class="mood-btn" data-mood="regret" onclick="setMoodEdit(${e.id}, 'regret', this)">🤔 Second thoughts</button>
-                <button type="button" class="mood-btn" data-mood="bad" onclick="setMoodEdit(${e.id}, 'bad', this)">🔄 Could do better</button>
+                <button type="button" class="mood-btn" data-mood="great" onclick="setMoodEdit(${e.id}, 'great', this)">🥰</button>
+                <button type="button" class="mood-btn" data-mood="good" onclick="setMoodEdit(${e.id}, 'good', this)">😊</button>
+                <button type="button" class="mood-btn" data-mood="neutral" onclick="setMoodEdit(${e.id}, 'neutral', this)">😐</button>
+                <button type="button" class="mood-btn" data-mood="regret" onclick="setMoodEdit(${e.id}, 'regret', this)">🤔</button>
+                <button type="button" class="mood-btn" data-mood="bad" onclick="setMoodEdit(${e.id}, 'bad', this)">🔄</button>
               </div>
-              <input type="hidden" id="edit_mood_${e.id}" value="${e.mood || ''}">
-              
-              <div style="margin-top: 1rem;">
-                <button class="btn" onclick="saveEdit(${e.id})">✓ Save</button>
-                <button class="btn" style="background: #666;" onclick="cancelEdit()">✕ Cancel</button>
-              </div>
+              <input type="hidden" id="edit_mood_${e.id}" value="${e.mood}">
+              <button class="btn" onclick="saveEdit(${e.id})">✓ Save</button>
+              <button class="btn" style="background: #666;" onclick="cancelEdit()">✕ Cancel</button>
             </div>
           `;
         }
 
-        // Normal view
         return `
           <div class="entry-item">
             <div class="entry-description">${cat.icon} ${e.desc}</div>
             <div class="entry-meta">${cat.label} • ${e.date}</div>
-            <div class="entry-amount">$${e.amount.toFixed(2)}</div>
+            <div class="entry-amount">${symbol}${e.amount.toFixed(2)}</div>
             <div class="entry-mood">${moodLabel}</div>
-            <div>
-              <button class="btn" onclick="startEdit(${e.id})">✎ Edit</button>
-              <button class="btn delete" onclick="deleteEntry(${e.id})">✕ Delete</button>
-            </div>
+            <div class="entry-projection">📈 5yr: ${symbol}${proj.year5.toFixed(2)} | 10yr: ${symbol}${proj.year10.toFixed(2)}</div>
+            <button class="btn" onclick="startEdit(${e.id})">✎ Edit</button>
+            <button class="btn delete" onclick="deleteEntry(${e.id})">✕ Delete</button>
           </div>
         `;
       }).join('');
 
-      document.getElementById('entries').innerHTML = html || '<div class="no-entries">No entries yet. Add one above!</div>';
+      document.getElementById('entries').innerHTML = html || '<div class="no-entries">No entries yet</div>';
     }
 
-    // Render insights
     function renderInsights() {
-      // Calculate mood breakdown
-      const moodCounts = {
-        great: 0,
-        good: 0,
-        neutral: 0,
-        regret: 0,
-        bad: 0
-      };
-
+      const symbol = MARKET_DATA[currentCurrency].symbol;
+      const moodCounts = { great: 0, good: 0, neutral: 0, regret: 0, bad: 0 };
       let totalAmount = 0;
-      let totalRegretAmount = 0;
 
       entries.forEach(e => {
-        if (moodCounts.hasOwnProperty(e.mood)) {
-          moodCounts[e.mood]++;
-        }
+        if (moodCounts.hasOwnProperty(e.mood)) moodCounts[e.mood]++;
         totalAmount += e.amount;
-        if (e.mood === 'regret' || e.mood === 'bad') {
-          totalRegretAmount += e.amount;
-        }
       });
 
-      // Build mood insights HTML
-      const moodInsightsHtml = Object.entries(MOOD_NAMES).map(([key, label]) => {
+      const proj = calculateProjection(totalAmount);
+      document.getElementById('investmentInsights').innerHTML = `
+        <div class="projection-row">
+          <div class="projection-label">Today</div>
+          <div class="projection-value">${symbol}${totalAmount.toFixed(2)}</div>
+        </div>
+        <div class="projection-row">
+          <div class="projection-label">In 5 years</div>
+          <div class="projection-value">${symbol}${proj.year5.toFixed(2)}</div>
+        </div>
+        <div class="projection-row">
+          <div class="projection-label">In 10 years</div>
+          <div class="projection-value">${symbol}${proj.year10.toFixed(2)}</div>
+        </div>
+      `;
+
+      const moodHtml = Object.entries(MOOD_NAMES).map(([key, label]) => {
         const count = moodCounts[key];
-        const percentage = entries.length > 0 ? ((count / entries.length) * 100).toFixed(0) : 0;
-        return `
-          <div class="insight-row">
-            <div class="insight-label">${label}</div>
-            <div class="insight-value">${count} (${percentage}%)</div>
-          </div>
-        `;
+        const pct = entries.length > 0 ? ((count / entries.length) * 100).toFixed(0) : 0;
+        return `<div class="insight-row"><div class="insight-label">${label}</div><div class="insight-value">${count} (${pct}%)</div></div>`;
       }).join('');
+      document.getElementById('moodInsights').innerHTML = moodHtml;
 
-      document.getElementById('moodInsights').innerHTML = moodInsightsHtml || '<div class="no-entries">No data yet</div>';
+      const avg = entries.length > 0 ? (totalAmount / entries.length).toFixed(2) : 0;
+      const hours = currentWage > 0 ? (totalAmount / currentWage).toFixed(1) : '—';
 
-      // Calculate summary stats
-      const totalEntries = entries.length;
-      const averagePerEntry = totalEntries > 0 ? (totalAmount / totalEntries).toFixed(2) : 0;
-      const regretRatio = totalEntries > 0 ? ((totalRegretAmount / totalAmount) * 100).toFixed(0) : 0;
-
-      document.getElementById('totalEntries').textContent = totalEntries;
-      document.getElementById('totalSpent').textContent = '$' + totalAmount.toFixed(2);
-      document.getElementById('averageEntry').textContent = '$' + averagePerEntry;
-      document.getElementById('regretRatio').textContent = regretRatio + '%';
+      document.getElementById('totalEntries').textContent = entries.length;
+      document.getElementById('totalSpent').textContent = symbol + totalAmount.toFixed(2);
+      document.getElementById('averageEntry').textContent = symbol + avg;
+      document.getElementById('hoursOfWork').textContent = hours + (currentWage > 0 ? ' hrs' : '');
     }
 
-    // Initialize
-    document.getElementById('date').valueAsDate = new Date();
-    render();
+    function exportCSV() {
+      const symbol = MARKET_DATA[currentCurrency].symbol;
+      let csv = 'Description,Amount,Category,Date,Mood,5-Year,10-Year\n';
+      
+      entries.forEach(e => {
+        const proj = calculateProjection(e.amount);
+        csv += `"${e.desc}",${e.amount},"${CATEGORIES[e.category].label}","${e.date}","${MOOD_NAMES[e.mood]}",${proj.year5.toFixed(2)},${proj.year10.toFixed(2)}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `wealth-clarity-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+    }
   </script>
 </body>
 </html>
