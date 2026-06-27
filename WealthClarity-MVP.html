@@ -34,6 +34,11 @@
       font-size: 1.1rem; 
       margin-bottom: 1rem;
     }
+
+    h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
     
     .card { 
       background: #141414; 
@@ -110,6 +115,71 @@
       color: #0f0f0f;
       border-color: #E8A87C;
     }
+
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      background: #333;
+      color: #f0ece4;
+      border: 1px solid #333;
+      padding: 0.5rem 0.8rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      font-family: Georgia, serif;
+      border: none;
+    }
+
+    .filter-pill:hover {
+      border-color: #E8A87C;
+    }
+
+    .filter-pill.active {
+      background: #E8A87C;
+      color: #0f0f0f;
+    }
+
+    .filter-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .insights-card {
+      background: #1a1a1a;
+      border: 1px solid #E8A87C;
+      border-radius: 8px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .insight-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #333;
+    }
+
+    .insight-row:last-child {
+      border-bottom: none;
+    }
+
+    .insight-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .insight-value {
+      text-align: right;
+      font-weight: bold;
+      color: #E8A87C;
+    }
     
     .entry-item {
       padding: 1rem;
@@ -170,6 +240,42 @@
       margin-bottom: 1rem;
       flex-wrap: wrap;
     }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #1e1e1e;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      padding: 0.8rem 1rem;
+      font-family: Georgia, serif;
+      font-size: 1rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: #E8A87C;
+    }
+
+    .tab-btn.active {
+      color: #E8A87C;
+      border-bottom-color: #E8A87C;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -225,8 +331,56 @@
     </div>
 
     <div class="card">
-      <h2>Entries</h2>
-      <div id="entries"></div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('log')">Log</button>
+        <button class="tab-btn" onclick="switchTab('insights')">Insights</button>
+      </div>
+
+      <!-- LOG TAB -->
+      <div id="log" class="tab-content active">
+        <h2>Filter by Mood</h2>
+        <div class="filter-section">
+          <div class="filter-pills">
+            <button class="filter-pill" onclick="filterByMood(null)">All Entries</button>
+            <button class="filter-pill" onclick="filterByMood('great')">🥰 Worth it</button>
+            <button class="filter-pill" onclick="filterByMood('good')">😊 Good</button>
+            <button class="filter-pill" onclick="filterByMood('neutral')">😐 Neutral</button>
+            <button class="filter-pill" onclick="filterByMood('regret')">🤔 Regret</button>
+            <button class="filter-pill" onclick="filterByMood('bad')">🔄 Bad</button>
+          </div>
+        </div>
+
+        <h2>Entries</h2>
+        <div id="entries"></div>
+      </div>
+
+      <!-- INSIGHTS TAB -->
+      <div id="insights" class="tab-content">
+        <h2>Mood Breakdown</h2>
+        <div class="insights-card">
+          <div id="moodInsights"></div>
+        </div>
+
+        <h2>Summary</h2>
+        <div class="insights-card">
+          <div class="insight-row">
+            <div class="insight-label">Total Entries</div>
+            <div class="insight-value" id="totalEntries">0</div>
+          </div>
+          <div class="insight-row">
+            <div class="insight-label">Total Spent</div>
+            <div class="insight-value" id="totalSpent">$0.00</div>
+          </div>
+          <div class="insight-row">
+            <div class="insight-label">Average per Entry</div>
+            <div class="insight-value" id="averageEntry">$0.00</div>
+          </div>
+          <div class="insight-row">
+            <div class="insight-label">Regret Ratio</div>
+            <div class="insight-value" id="regretRatio">0%</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -262,6 +416,45 @@
     // Data storage
     let entries = JSON.parse(localStorage.getItem('el_e') || '[]');
     let editingId = null;
+    let currentMoodFilter = null;
+
+    // Switch tabs
+    function switchTab(tab) {
+      // Hide all tabs
+      document.getElementById('log').classList.remove('active');
+      document.getElementById('insights').classList.remove('active');
+
+      // Remove active from all tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      // Show selected tab and mark button active
+      document.getElementById(tab).classList.add('active');
+      event.target.classList.add('active');
+
+      // Render insights if switching to insights tab
+      if (tab === 'insights') {
+        renderInsights();
+      }
+    }
+
+    // Filter by mood
+    function filterByMood(mood) {
+      currentMoodFilter = mood;
+      
+      // Update active state on filter pills
+      document.querySelectorAll('.filter-pill').forEach(pill => {
+        pill.classList.remove('active');
+      });
+      
+      if (mood === null) {
+        document.querySelectorAll('.filter-pill')[0].classList.add('active');
+      } else {
+        const pillIndex = ['great', 'good', 'neutral', 'regret', 'bad'].indexOf(mood) + 1;
+        document.querySelectorAll('.filter-pill')[pillIndex].classList.add('active');
+      }
+      
+      render();
+    }
 
     // Set mood on add entry form
     function setMood(moodValue, buttonElement) {
@@ -393,9 +586,19 @@
       }
     }
 
-    // Render all entries
+    // Get filtered entries
+    function getFilteredEntries() {
+      if (currentMoodFilter === null) {
+        return entries;
+      }
+      return entries.filter(e => e.mood === currentMoodFilter);
+    }
+
+    // Render entries (with filtering)
     function render() {
-      const html = entries.map(e => {
+      const filteredEntries = getFilteredEntries();
+      
+      const html = filteredEntries.map(e => {
         const cat = CATEGORIES[e.category];
         const moodLabel = MOOD_NAMES[e.mood] || '❓ Not rated';
 
@@ -471,6 +674,55 @@
       }).join('');
 
       document.getElementById('entries').innerHTML = html || '<div class="no-entries">No entries yet. Add one above!</div>';
+    }
+
+    // Render insights
+    function renderInsights() {
+      // Calculate mood breakdown
+      const moodCounts = {
+        great: 0,
+        good: 0,
+        neutral: 0,
+        regret: 0,
+        bad: 0
+      };
+
+      let totalAmount = 0;
+      let totalRegretAmount = 0;
+
+      entries.forEach(e => {
+        if (moodCounts.hasOwnProperty(e.mood)) {
+          moodCounts[e.mood]++;
+        }
+        totalAmount += e.amount;
+        if (e.mood === 'regret' || e.mood === 'bad') {
+          totalRegretAmount += e.amount;
+        }
+      });
+
+      // Build mood insights HTML
+      const moodInsightsHtml = Object.entries(MOOD_NAMES).map(([key, label]) => {
+        const count = moodCounts[key];
+        const percentage = entries.length > 0 ? ((count / entries.length) * 100).toFixed(0) : 0;
+        return `
+          <div class="insight-row">
+            <div class="insight-label">${label}</div>
+            <div class="insight-value">${count} (${percentage}%)</div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('moodInsights').innerHTML = moodInsightsHtml || '<div class="no-entries">No data yet</div>';
+
+      // Calculate summary stats
+      const totalEntries = entries.length;
+      const averagePerEntry = totalEntries > 0 ? (totalAmount / totalEntries).toFixed(2) : 0;
+      const regretRatio = totalEntries > 0 ? ((totalRegretAmount / totalAmount) * 100).toFixed(0) : 0;
+
+      document.getElementById('totalEntries').textContent = totalEntries;
+      document.getElementById('totalSpent').textContent = '$' + totalAmount.toFixed(2);
+      document.getElementById('averageEntry').textContent = '$' + averagePerEntry;
+      document.getElementById('regretRatio').textContent = regretRatio + '%';
     }
 
     // Initialize
