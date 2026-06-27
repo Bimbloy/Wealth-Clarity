@@ -98,6 +98,10 @@
     .btn.delete {
       background: #555;
     }
+
+    .btn.secondary {
+      background: #666;
+    }
     
     .mood-btn {
       background: #333;
@@ -164,6 +168,26 @@
       border-radius: 8px;
       padding: 1.2rem;
       margin-bottom: 1rem;
+    }
+
+    .backup-card {
+      background: #2a1a1a;
+      border: 2px solid #E8A87C;
+      border-radius: 8px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .backup-card h3 {
+      color: #E8A87C;
+      margin-bottom: 0.8rem;
+    }
+
+    .backup-card p {
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-bottom: 1rem;
+      line-height: 1.5;
     }
 
     .insight-row {
@@ -318,7 +342,7 @@
       display: block;
     }
 
-    /* Modal styles - FIXED FOR MOBILE */
+    /* Modal styles */
     .modal {
       position: fixed;
       z-index: 10000;
@@ -356,6 +380,16 @@
       margin-bottom: 1rem;
       line-height: 1.6;
       font-size: 0.95rem;
+    }
+
+    .modal-content ul {
+      margin-left: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .modal-content li {
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
     }
 
     .modal-buttons {
@@ -423,17 +457,35 @@
   </style>
 </head>
 <body>
-  <!-- Disclaimer Modal -->
+  <!-- Opening Disclaimer Modal -->
   <div id="disclaimerModal" class="modal">
     <div class="modal-content">
       <h2>⚠️ Important Disclaimer</h2>
-      <p><strong>Wealth Clarity</strong> is an educational tool designed to help you understand your spending and visualize potential long-term wealth growth. It is NOT financial advice.</p>
-      <p>✓ Investment projections are illustrative only, based on historical market averages.</p>
-      <p>✓ Actual returns may vary. Past performance does not guarantee future results.</p>
-      <p>✓ Always consult with a qualified financial advisor before making investment decisions.</p>
-      <p>✓ Your data is stored locally on this device. We do not collect or transmit your personal information.</p>
+      
+      <h3 style="color: #E8A87C; margin-top: 1rem;">What Wealth Clarity Is</h3>
+      <p><strong>Wealth Clarity</strong> is an educational tool designed to help you understand your spending and visualize potential long-term wealth growth. It is <strong>NOT financial advice.</strong></p>
+
+      <h3 style="color: #E8A87C;">Your Data & Privacy</h3>
+      <ul>
+        <li><strong>✓ All data is stored ONLY on this device</strong> (not on servers)</li>
+        <li><strong>✓ We do NOT collect, track, or transmit your data</strong></li>
+        <li><strong>✓ You own 100% of your information</strong></li>
+        <li><strong>✓ If you clear your browser cache, data will be deleted</strong></li>
+        <li><strong>✓ If you change devices, data must be transferred manually via export</strong></li>
+      </ul>
+
+      <h3 style="color: #E8A87C;">Your Responsibility</h3>
+      <p>💾 <strong>Back up your data regularly.</strong> Use the CSV export feature to download your data as a backup. You can store this safely and re-import later if needed.</p>
+
+      <h3 style="color: #E8A87C;">Investment Projections</h3>
+      <ul>
+        <li>✓ Projections are illustrative only, based on historical market averages</li>
+        <li>✓ Actual returns may vary significantly. Past performance does not guarantee future results</li>
+        <li>✓ Always consult with a qualified financial advisor before making investment decisions</li>
+      </ul>
+
       <div class="modal-buttons">
-        <button class="btn" onclick="acceptDisclaimer()">I Understand</button>
+        <button class="btn" onclick="acceptDisclaimer()">I Understand & Accept</button>
       </div>
     </div>
   </div>
@@ -444,11 +496,13 @@
       <h2>About Your Advisor</h2>
       <p><strong>Wealth Clarity does NOT endorse any financial advisor.</strong></p>
       <p>The advisor information shown is for reference only. Before working with any advisor:</p>
-      <p>✓ Verify their credentials and licensing</p>
-      <p>✓ Review their fee structure</p>
-      <p>✓ Check their background and experience</p>
-      <p>✓ Ensure they are a fiduciary (required to act in your best interest)</p>
-      <p>Wealth Clarity assumes no liability for any advisor relationship or outcomes.</p>
+      <ul>
+        <li>✓ Verify their credentials and licensing</li>
+        <li>✓ Review their fee structure</li>
+        <li>✓ Check their background and experience</li>
+        <li>✓ Ensure they are a fiduciary (required to act in your best interest)</li>
+      </ul>
+      <p><strong>Wealth Clarity assumes no liability</strong> for any advisor relationship or outcomes.</p>
       <div class="modal-buttons">
         <button class="btn" onclick="closeAdvisorModal()">I Understand</button>
       </div>
@@ -522,11 +576,11 @@
     </div>
 
     <!-- Advisor Section -->
-    <div class="advisor-section">
+    <div class="advisor-section" id="advisorSection" style="display: none;">
       <h3>💬 Need a Financial Advisor?</h3>
-      <p>Consider speaking with <span class="advisor-link" onclick="openAdvisorModal()"><strong>Adeola Monofi</strong></span></p>
+      <p>Consider speaking with <span class="advisor-link" onclick="openAdvisorModal()"><strong id="advisorNameDisplay"></strong></span> — <span id="advisorBioDisplay"></span></p>
       <button class="btn" onclick="scheduleCall()">📅 Schedule a Call</button>
-      <button class="btn" style="background: #666;" onclick="shareWithAdvisor()">📤 Share</button>
+      <button class="btn secondary" onclick="shareWithAdvisor()">📤 Share with Advisor</button>
     </div>
 
     <div class="card">
@@ -555,9 +609,25 @@
 
       <!-- INSIGHTS TAB -->
       <div id="insights" class="tab-content">
+        <h2>Data Backup Reminder</h2>
+        <div class="backup-card">
+          <h3>💾 Protect Your Data</h3>
+          <p>Your data is stored locally on this device only. To prevent data loss, export your data regularly as a backup.</p>
+          <p><strong>Why export?</strong></p>
+          <ul style="margin-left: 1rem; margin-bottom: 1rem;">
+            <li>Device loss, theft, or damage</li>
+            <li>Switching to a new phone</li>
+            <li>Browser cache cleared</li>
+            <li>Sharing with your advisor for planning</li>
+          </ul>
+          <button class="btn" onclick="exportCSV()">📥 Export Data as CSV Now</button>
+        </div>
+
         <h2>What If You Invested It?</h2>
         <div class="insights-card">
+          <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #999;">If you invested all your spending (instead of spending it), here's the projected growth:</p>
           <div id="investmentInsights"></div>
+          <p style="margin-top: 1rem; font-size: 0.8rem; color: #666; font-style: italic;">Based on historical market averages. Not financial advice. Consult an advisor.</p>
         </div>
 
         <h2>Mood Breakdown</h2>
@@ -584,14 +654,32 @@
             <div class="insight-value" id="hoursOfWork">—</div>
           </div>
         </div>
-
-        <button class="btn" onclick="exportCSV()">📥 Download CSV</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Market data
+    // ============================================
+    // ADVISOR CONFIGURATION - CUSTOMIZE PER ADVISOR
+    // ============================================
+    const ADVISOR_CONFIG = {
+      // Advisor branding
+      advisorName: "Adeola Monofi",
+      advisorCompany: "The Money Universe",
+      advisorBio: "trusted financial advisor focused on helping you build wealth intentionally",
+      
+      // Advisor contact
+      advisorEmail: "hello@adeolamonofi.com",
+      advisorBookingUrl: "https://www.adeolamonofi.com/schedule-financial-advisory-call",
+      
+      // Customization
+      appBrandColor: "#E8A87C",
+      showAdvisorSection: true
+    };
+
+    // ============================================
+    // MARKET DATA & CATEGORIES
+    // ============================================
     const MARKET_DATA = {
       usd: { symbol: '$', rate: 0.07 },
       cad: { symbol: '$', rate: 0.065 },
@@ -599,7 +687,6 @@
       aud: { symbol: '$', rate: 0.07 }
     };
 
-    // Categories
     const CATEGORIES = {
       food: { icon: '🍽️', label: 'Food & Dining' },
       transport: { icon: '🚗', label: 'Transport' },
@@ -618,7 +705,6 @@
       other: { icon: '📦', label: 'Other' }
     };
 
-    // Moods
     const MOOD_NAMES = {
       great: '🥰 Worth every penny',
       good: '😊 Good call',
@@ -627,26 +713,32 @@
       bad: '🔄 Could do better'
     };
 
-    // Data
+    // ============================================
+    // STATE MANAGEMENT
+    // ============================================
     let entries = JSON.parse(localStorage.getItem('el_e') || '[]');
     let currentCurrency = localStorage.getItem('el_c') || 'usd';
     let currentWage = parseFloat(localStorage.getItem('el_w') || '0');
     let editingId = null;
     let currentMoodFilter = null;
 
-    // Initialize
+    // Initialize UI
     document.getElementById('currency').value = currentCurrency;
     if (currentWage > 0) {
       document.getElementById('wage').value = currentWage;
     }
     document.getElementById('date').valueAsDate = new Date();
 
-    // Check disclaimer on load
+    // Page load
     window.addEventListener('load', function() {
       checkDisclaimer();
+      initializeAdvisor();
       render();
     });
 
+    // ============================================
+    // DISCLAIMER FUNCTIONS
+    // ============================================
     function checkDisclaimer() {
       const accepted = localStorage.getItem('el_disclaimer') === 'true';
       if (!accepted) {
@@ -659,6 +751,17 @@
       document.getElementById('disclaimerModal').classList.remove('show');
     }
 
+    // ============================================
+    // ADVISOR FUNCTIONS
+    // ============================================
+    function initializeAdvisor() {
+      if (ADVISOR_CONFIG.showAdvisorSection) {
+        document.getElementById('advisorSection').style.display = 'block';
+        document.getElementById('advisorNameDisplay').textContent = ADVISOR_CONFIG.advisorName;
+        document.getElementById('advisorBioDisplay').textContent = ADVISOR_CONFIG.advisorBio;
+      }
+    }
+
     function openAdvisorModal() {
       document.getElementById('advisorDisclaimerModal').classList.add('show');
     }
@@ -668,7 +771,7 @@
     }
 
     function scheduleCall() {
-      const url = 'https://www.adeolamonofi.com/schedule-financial-advisory-call';
+      const url = ADVISOR_CONFIG.advisorBookingUrl;
       window.location.href = url;
     }
 
@@ -676,12 +779,15 @@
       const totalSpent = entries.reduce((sum, e) => sum + e.amount, 0);
       const summary = entries.map(e => `${e.desc}: ${MARKET_DATA[currentCurrency].symbol}${e.amount.toFixed(2)}`).join('\n');
       
-      const emailBody = `Hi Adeola,%0A%0AHere's my spending summary:%0A%0ATotal: ${MARKET_DATA[currentCurrency].symbol}${totalSpent.toFixed(2)}%0A%0A${summary.replace(/\n/g, '%0A')}`;
+      const emailBody = `Hi ${ADVISOR_CONFIG.advisorName},%0A%0AHere's my spending summary from Wealth Clarity:%0A%0ATotal: ${MARKET_DATA[currentCurrency].symbol}${totalSpent.toFixed(2)}%0A%0A${summary.replace(/\n/g, '%0A')}%0A%0AI'd like to discuss how to optimize my finances.%0A%0AThanks!`;
       
-      const mailtoLink = `mailto:hello@adeolamonofi.com?subject=Wealth%20Clarity%20Summary&body=${emailBody}`;
+      const mailtoLink = `mailto:${ADVISOR_CONFIG.advisorEmail}?subject=Wealth%20Clarity%20Summary&body=${emailBody}`;
       window.location.href = mailtoLink;
     }
 
+    // ============================================
+    // SETTINGS FUNCTIONS
+    // ============================================
     function setCurrency(curr) {
       currentCurrency = curr;
       localStorage.setItem('el_c', curr);
@@ -696,6 +802,9 @@
       renderInsights();
     }
 
+    // ============================================
+    // CALCULATION FUNCTIONS
+    // ============================================
     function calculateProjection(amount) {
       const rate = MARKET_DATA[currentCurrency].rate;
       const year5 = amount * Math.pow(1 + rate, 5);
@@ -703,6 +812,9 @@
       return { year5, year10 };
     }
 
+    // ============================================
+    // TAB & FILTER FUNCTIONS
+    // ============================================
     function switchTab(tab) {
       document.getElementById('log').classList.remove('active');
       document.getElementById('insights').classList.remove('active');
@@ -732,6 +844,9 @@
       render();
     }
 
+    // ============================================
+    // MOOD FUNCTIONS
+    // ============================================
     function setMood(moodValue, buttonElement) {
       document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('selected'));
       buttonElement.classList.add('selected');
@@ -744,6 +859,9 @@
       document.getElementById(`edit_mood_${entryId}`).value = moodValue;
     }
 
+    // ============================================
+    // ENTRY CRUD FUNCTIONS
+    // ============================================
     function addEntry() {
       const desc = document.getElementById('desc').value.trim();
       const amount = parseFloat(document.getElementById('amount').value);
@@ -782,7 +900,7 @@
 
       localStorage.setItem('el_e', JSON.stringify(entries));
       
-      // CLEAR FORM
+      // Clear form
       document.getElementById('desc').value = '';
       document.getElementById('amount').value = '';
       document.getElementById('category').value = 'food';
@@ -844,6 +962,9 @@
       }
     }
 
+    // ============================================
+    // RENDER FUNCTIONS
+    // ============================================
     function getFilteredEntries() {
       if (currentMoodFilter === null) return entries;
       return entries.filter(e => e.mood === currentMoodFilter);
@@ -959,9 +1080,12 @@
       document.getElementById('hoursOfWork').textContent = hours + (currentWage > 0 ? ' hrs' : '');
     }
 
+    // ============================================
+    // EXPORT FUNCTION
+    // ============================================
     function exportCSV() {
       const symbol = MARKET_DATA[currentCurrency].symbol;
-      let csv = 'Description,Amount,Category,Date,Mood,5-Year,10-Year\n';
+      let csv = 'Description,Amount,Category,Date,Mood,5-Year Projection,10-Year Projection\n';
       
       entries.forEach(e => {
         const proj = calculateProjection(e.amount);
