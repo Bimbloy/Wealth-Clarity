@@ -568,6 +568,14 @@
     <div class="card">
       <h2>Add Entry</h2>
       
+      <label>Currency</label>
+      <select id="currency" onchange="setCurrency(this.value)">
+        <option value="usd">🇺🇸 USD (United States)</option>
+        <option value="cad">🇨🇦 CAD (Canada)</option>
+        <option value="gbp">🇬🇧 GBP (UK)</option>
+        <option value="aud">🇦🇺 AUD (Australia)</option>
+      </select>
+      
       <label>Description</label>
       <input type="text" id="desc" placeholder="What did you spend on?">
       
@@ -611,6 +619,14 @@
       <input type="hidden" id="mood" value="">
       
       <button class="btn" onclick="addEntry()">+ Add Entry</button>
+    </div>
+
+    <!-- Advisor Section -->
+    <div class="card">
+      <h2>💬 Need a Financial Advisor?</h2>
+      <p>Consider speaking with <span class="advisor-link" onclick="openAdvisorModal()"><strong id="advisorNameDisplay"></strong></span> — <span id="advisorBioDisplay"></span></p>
+      <button class="btn" onclick="scheduleCall()">📅 Schedule a Call</button>
+      <button class="btn secondary" onclick="shareWithAdvisor()">📤 Share with Advisor</button>
     </div>
 
     <div class="card">
@@ -701,7 +717,7 @@
         <!-- IMPORT SECTION -->
         <div class="info-section">
           <h4>📤 Import Data</h4>
-          <p>Got a new phone? Import your CSV backup to restore all your entries.</p>
+          <p>Upload previously saved record to restore your entries.</p>
           <label>Select CSV file</label>
           <input type="file" id="csvFile" accept=".csv" onchange="handleFileSelect(event)">
           <div id="importPreview"></div>
@@ -711,14 +727,6 @@
         <div class="info-section">
           <h4>⚙️ Preferences</h4>
           
-          <label>Currency</label>
-          <select id="currency" onchange="setCurrency(this.value)">
-            <option value="usd">🇺🇸 USD (United States)</option>
-            <option value="cad">🇨🇦 CAD (Canada)</option>
-            <option value="gbp">🇬🇧 GBP (UK)</option>
-            <option value="aud">🇦🇺 AUD (Australia)</option>
-          </select>
-
           <label>Hourly Wage (for context)</label>
           <input type="number" id="wage" placeholder="Your hourly wage (optional)" min="0" step="0.01" onchange="saveWage()">
         </div>
@@ -741,8 +749,8 @@
           <p><strong>Where is my data?</strong></p>
           <p>All your data is stored locally on this device only. We don't have servers, databases, or cloud storage. You own your data 100%.</p>
           
-          <p style="margin-top: 1rem;"><strong>What if I change phones?</strong></p>
-          <p>Export your data as CSV (use the button above), keep it safe, and import it on your new phone when you set up Wealth Clarity.</p>
+          <p style="margin-top: 1rem;"><strong>What if I change devices?</strong></p>
+          <p>Export your data as CSV (use the button above), keep it safe, and import it on your new device when you set up Wealth Clarity.</p>
           
           <p style="margin-top: 1rem;"><strong>Can you see my data?</strong></p>
           <p>No. We cannot and do not collect any of your information. Your financial data never leaves your device.</p>
@@ -754,7 +762,7 @@
           <p><strong>Wealth Clarity v1.0</strong></p>
           <p style="margin-top: 0.5rem;">Financial wellness tracker with investment projections and mood analytics.</p>
           <p style="margin-top: 1rem;"><strong>Questions or feedback?</strong></p>
-          <p>Email: <a href="mailto:hello@wealthclarity.com" style="color: #E8A87C; text-decoration: none;">hello@wealthclarity.com</a></p>
+          <p>We'd love to hear from you as we continue improving Wealth Clarity.</p>
         </div>
 
         <!-- DANGER ZONE -->
@@ -864,6 +872,8 @@
         <p style="font-size: 0.9rem; color: #999; margin-top: 0.3rem;">${ADVISOR_CONFIG.advisorCompany}</p>
         <p style="font-size: 0.85rem; color: #ccc; margin-top: 0.5rem;">${ADVISOR_CONFIG.advisorBio}</p>
       `;
+      document.getElementById('advisorNameDisplay').textContent = ADVISOR_CONFIG.advisorName;
+      document.getElementById('advisorBioDisplay').textContent = ADVISOR_CONFIG.advisorBio;
       document.getElementById('advisorInfo').innerHTML = advisorHtml;
     }
 
