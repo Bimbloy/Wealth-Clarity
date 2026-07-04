@@ -1352,6 +1352,7 @@
     <div class="tagline">A Money Savvy Expense Tracker</div>
     <p>Track your spending. Complete your financial profile. Build toward your goals.</p>
     <button class="btn-hero" onclick="scheduleCall()">📅 Schedule a Call with Adeola</button>
+    <div style="margin-top: 0.8rem;"><a href="#" onclick="openHelp(); return false;" style="color: #E8A87C; font-size: 0.85rem; text-decoration: underline; cursor: pointer;">❓ New here? How to use this app</a></div>
   </section>
 
   <div class="container">
@@ -1695,6 +1696,46 @@
           <div class="settings-subtext" style="margin-top: 1rem;">Wealth Clarity is an independent tracking tool. Sharing your profile does not create an advisory relationship, and any information here is for general reference, not personalized financial advice. Speak with a qualified professional before making financial decisions.</div>
         </details>
 
+        <!-- HOW TO USE -->
+        <details class="settings-section" id="helpSection">
+          <summary>
+            <span class="settings-summary-title">📖 How to Use This App</span>
+            <span class="settings-chevron">▸</span>
+          </summary>
+
+          <div class="settings-desc">Wealth Clarity works right in your browser — there's nothing to download from an app store. For quick access, you can save it to your phone's home screen so it opens like a regular app.</div>
+
+          <div class="faq">
+            <div class="faq-q">📱 Save to Home Screen — iPhone / iPad (Safari)</div>
+            <div class="faq-a">
+              1. Open this page in <strong>Safari</strong> (not Chrome — "Add to Home Screen" only works in Safari on iPhone).<br>
+              2. Tap the <strong>Share</strong> button (the square with an arrow pointing up, at the bottom of the screen).<br>
+              3. Scroll down and tap <strong>Add to Home Screen</strong>.<br>
+              4. Tap <strong>Add</strong> in the top corner. The Wealth Clarity icon will appear on your home screen.
+            </div>
+          </div>
+
+          <div class="faq">
+            <div class="faq-q">🤖 Save to Home Screen — Android (Chrome)</div>
+            <div class="faq-a">
+              1. Open this page in <strong>Chrome</strong>.<br>
+              2. Tap the <strong>⋮ menu</strong> (three dots, top-right).<br>
+              3. Tap <strong>Add to Home screen</strong> (or <strong>Install app</strong>, if shown).<br>
+              4. Tap <strong>Add</strong> to confirm. The icon will appear on your home screen.
+            </div>
+          </div>
+
+          <div class="faq">
+            <div class="faq-q">💻 Using it on a computer</div>
+            <div class="faq-a">Just keep this page open, or bookmark it (Ctrl+D on Windows, ⌘+D on Mac) so you can return to it anytime. All your data stays saved in that browser on that device.</div>
+          </div>
+
+          <div class="faq">
+            <div class="faq-q">⚠️ Good to know</div>
+            <div class="faq-a">Your data is saved on the specific device and browser you use. If you switch phones or browsers, use <strong>Backup & Restore</strong> (above) to move your data across. And because everything is stored locally, clearing your browser data will also clear your entries — so keep a backup.</div>
+          </div>
+        </details>
+
         <!-- DATA & PRIVACY -->
         <details class="settings-section">
           <summary>
@@ -1967,6 +2008,18 @@
     function setChecklistItem(id, isDone) {
       const el = document.getElementById(id);
       if (el) el.classList.toggle('done', isDone);
+    }
+
+    // Jump to Settings and open the "How to Use" help section.
+    function openHelp() {
+      activateTab('settings');
+      setTimeout(() => {
+        const help = document.getElementById('helpSection');
+        if (help) {
+          help.open = true;
+          help.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
     }
 
     // Jump to Settings and open the Import Bank Statement section.
