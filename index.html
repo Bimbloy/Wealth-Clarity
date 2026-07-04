@@ -84,39 +84,248 @@
       margin-bottom: 10px;
     }
 
-    .disclaimer-banner {
-      background: #1a1a2e;
-      border-bottom: 1px solid #E8A87C;
-      padding: 1rem 1.25rem;
-    }
-
-    .disclaimer-banner-inner {
-      max-width: 800px;
-      margin: 0 auto;
+    .disclaimer-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       display: flex;
       align-items: center;
-      gap: 1rem;
-      color: #c8c8d0;
-      font-size: 0.82rem;
-      line-height: 1.5;
+      justify-content: center;
+      padding: 1.5rem;
+      overflow-y: auto;
     }
 
-    .disclaimer-banner-inner strong { color: #E8A87C; }
+    .disclaimer-gate-card {
+      background: #0f0f0f;
+      border: 1px solid #E8A87C;
+      border-radius: 12px;
+      max-width: 540px;
+      width: 100%;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
 
-    .disclaimer-dismiss {
-      flex-shrink: 0;
+    .disclaimer-gate-brand {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #E8A87C;
+      letter-spacing: 0.5px;
+    }
+
+    .disclaimer-gate-sub {
+      color: #999;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .disclaimer-gate-card h2 {
+      color: #f0ece4;
+      font-size: 1.3rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .disclaimer-gate-card p {
+      color: #c8c8d0;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .disclaimer-gate-card strong { color: #E8A87C; }
+
+    .disclaimer-gate-btn {
       background: #E8A87C;
       color: #0f0f0f;
       border: none;
-      border-radius: 4px;
-      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      padding: 0.9rem 2rem;
       font-weight: bold;
+      font-size: 1rem;
       cursor: pointer;
-      font-size: 0.85rem;
-      align-self: flex-start;
+      margin-top: 0.8rem;
+      width: 100%;
     }
 
-    .disclaimer-dismiss:hover { background: #d9976b; }
+    .disclaimer-gate-btn:hover { background: #d9976b; }
+
+    /* WELCOME CARD (personalized, new vs returning) */
+    .welcome-card {
+      background: linear-gradient(135deg, #2a1a1a 0%, #1a1a2e 100%);
+      border: 1px solid #E8A87C;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .welcome-card h2 {
+      color: #E8A87C;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .welcome-card p {
+      color: #d8d8e0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+
+    .welcome-card .welcome-dismiss {
+      background: none;
+      border: 1px solid #666;
+      color: #999;
+      border-radius: 5px;
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-top: 0.8rem;
+    }
+
+    /* ONBOARDING CHECKLIST */
+    .onboarding-checklist {
+      background: #1a1a1a;
+      border-left: 4px solid #E8A87C;
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .onboarding-checklist h3 {
+      color: #E8A87C;
+      font-size: 1.05rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .onboarding-checklist .checklist-sub {
+      color: #999;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #262626;
+      cursor: pointer;
+    }
+
+    .checklist-item:last-child { border-bottom: none; }
+
+    .checklist-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #666;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #0f0f0f;
+    }
+
+    .checklist-item.done .checklist-check {
+      background: #4CAF50;
+      border-color: #4CAF50;
+    }
+
+    .checklist-item.done .checklist-label {
+      color: #666;
+      text-decoration: line-through;
+    }
+
+    .checklist-label {
+      color: #d8d8e0;
+      font-size: 0.92rem;
+      flex: 1;
+    }
+
+    .checklist-arrow { color: #E8A87C; font-size: 1.1rem; }
+    .checklist-item.done .checklist-arrow { display: none; }
+
+    .checklist-progress {
+      color: #4CAF50;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-top: 0.8rem;
+      text-align: center;
+    }
+
+    /* GUIDED TOUR OVERLAY */
+    .tour-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1900;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .tour-card {
+      background: #0f0f0f;
+      border: 1px solid #E8A87C;
+      border-radius: 12px;
+      max-width: 440px;
+      width: 100%;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .tour-emoji { font-size: 2.5rem; margin-bottom: 0.8rem; }
+
+    .tour-card h3 {
+      color: #E8A87C;
+      font-size: 1.25rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .tour-card p {
+      color: #d8d8e0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .tour-dots {
+      display: flex;
+      gap: 0.4rem;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .tour-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #444;
+    }
+
+    .tour-dot.active { background: #E8A87C; }
+
+    .tour-buttons {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .tour-btn {
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      font-size: 0.95rem;
+    }
+
+    .tour-btn.primary { background: #E8A87C; color: #0f0f0f; }
+    .tour-btn.secondary { background: none; border: 1px solid #666; color: #999; }
 
     .add-entry-card summary {
       display: flex;
@@ -1113,6 +1322,30 @@
 </head>
 <body>
   <!-- HERO SECTION -->
+  <div class="disclaimer-gate" id="disclaimerGate" style="display: none;">
+    <div class="disclaimer-gate-card">
+      <div class="disclaimer-gate-brand">Wealth Clarity</div>
+      <div class="disclaimer-gate-sub">in partnership with Adeola Monofi · The Money Universe</div>
+      <h2>Welcome — a quick note before we begin</h2>
+      <p>Wealth Clarity is a personal tracking tool created to help you see your money clearly and walk into your advisor conversations prepared. It's for <strong>general informational and educational purposes only</strong>.</p>
+      <p>It is <strong>not a substitute for professional financial, investment, tax, or legal advice</strong>, and any projections shown are illustrative estimates, not guarantees. Everything you enter stays private on your own device. Before making financial decisions, please consult a qualified professional such as Adeola.</p>
+      <button class="disclaimer-gate-btn" onclick="acceptDisclaimerGate()">Got it — let's begin</button>
+    </div>
+  </div>
+
+  <div class="tour-overlay" id="tourOverlay">
+    <div class="tour-card">
+      <div class="tour-emoji" id="tourEmoji">👋</div>
+      <h3 id="tourTitle"></h3>
+      <p id="tourBody"></p>
+      <div class="tour-dots" id="tourDots"></div>
+      <div class="tour-buttons">
+        <button class="tour-btn secondary" onclick="skipTour()">Skip</button>
+        <button class="tour-btn primary" id="tourNextBtn" onclick="nextTourStep()">Next</button>
+      </div>
+    </div>
+  </div>
+
   <section class="hero">
     <div class="hero-greeting" id="heroGreeting" style="display: none;"></div>
     <h1>Wealth Clarity</h1>
@@ -1120,15 +1353,6 @@
     <p>Track your spending. Complete your financial profile. Build toward your goals.</p>
     <button class="btn-hero" onclick="scheduleCall()">📅 Schedule a Call with Adeola</button>
   </section>
-
-  <div class="disclaimer-banner" id="disclaimerBanner" style="display: none;">
-    <div class="disclaimer-banner-inner">
-      <div>
-        <strong>Before you start:</strong> Wealth Clarity is a personal tracking tool for informational purposes only. It does not provide financial, investment, tax, or legal advice, and any projections shown are illustrative estimates based on historical averages — not guarantees. All data stays on your device. For advice tailored to your situation, speak with a qualified professional such as Adeola Monofi.
-      </div>
-      <button class="disclaimer-dismiss" onclick="dismissDisclaimer()">Got it</button>
-    </div>
-  </div>
 
   <div class="container">
     <!-- TABS -->
@@ -1148,6 +1372,38 @@
 
     <!-- LOG TAB -->
     <div id="log" class="tab-content">
+      <div class="welcome-card" id="welcomeCard" style="display: none;">
+        <h2 id="welcomeHeading">Welcome</h2>
+        <p id="welcomeBody"></p>
+        <button class="welcome-dismiss" onclick="dismissWelcome()">Dismiss</button>
+      </div>
+
+      <div class="onboarding-checklist" id="onboardingChecklist" style="display: none;">
+        <h3>🚀 Get started in 4 steps</h3>
+        <div class="checklist-sub">The fastest way to a complete picture — most of this can be automated, no manual typing.</div>
+        <div class="checklist-item" id="check_profile" onclick="activateTab('profile')">
+          <div class="checklist-check">✓</div>
+          <div class="checklist-label">Complete your financial profile (income, assets, goals)</div>
+          <div class="checklist-arrow">›</div>
+        </div>
+        <div class="checklist-item" id="check_statement" onclick="goToImport()">
+          <div class="checklist-check">✓</div>
+          <div class="checklist-label">Import a bank or credit card statement</div>
+          <div class="checklist-arrow">›</div>
+        </div>
+        <div class="checklist-item" id="check_receipt" onclick="goToImport()">
+          <div class="checklist-check">✓</div>
+          <div class="checklist-label">Scan a receipt to auto-categorize your spending</div>
+          <div class="checklist-arrow">›</div>
+        </div>
+        <div class="checklist-item" id="check_share" onclick="activateTab('profile')">
+          <div class="checklist-check">✓</div>
+          <div class="checklist-label">Share your snapshot with Adeola before your meeting</div>
+          <div class="checklist-arrow">›</div>
+        </div>
+        <div class="checklist-progress" id="checklistProgress"></div>
+      </div>
+
       <div class="card">
         <!-- NET WORTH BANNER -->
         <div class="net-worth-banner">
@@ -1615,16 +1871,162 @@
       updateInsights();
       updateHeroGreeting();
 
-      // Show the informational disclaimer until the person acknowledges it
-      // once. Stored separately from user data so it survives a data reset.
-      if (safeGetItem('wc_disclaimer_ack') !== 'true') {
-        document.getElementById('disclaimerBanner').style.display = 'block';
-      }
+      initOnboarding();
     });
 
-    function dismissDisclaimer() {
+    // ── Onboarding orchestration ─────────────────────────────────────────
+    // First-ever visit: full-page disclaimer gate → guided tour → checklist.
+    // Returning visits: no gate/tour; a short welcome-back + the checklist
+    // (until all steps are done, then it retires itself).
+    function initOnboarding() {
+      const gateAccepted = safeGetItem('wc_disclaimer_ack') === 'true';
+      if (!gateAccepted) {
+        document.getElementById('disclaimerGate').style.display = 'flex';
+      } else {
+        renderWelcome();
+        renderChecklist();
+      }
+    }
+
+    function acceptDisclaimerGate() {
       safeSetItem('wc_disclaimer_ack', 'true');
-      document.getElementById('disclaimerBanner').style.display = 'none';
+      document.getElementById('disclaimerGate').style.display = 'none';
+      // First run → show the guided tour once.
+      if (safeGetItem('wc_tour_done') !== 'true') {
+        startTour();
+      } else {
+        renderWelcome();
+        renderChecklist();
+      }
+    }
+
+    // ── Personalized welcome (new vs returning) ──────────────────────────
+    function renderWelcome() {
+      const card = document.getElementById('welcomeCard');
+      const heading = document.getElementById('welcomeHeading');
+      const body = document.getElementById('welcomeBody');
+      const firstName = profile.fullName ? profile.fullName.trim().split(/\s+/)[0] : '';
+
+      if (safeGetItem('wc_welcome_dismissed') === 'true') {
+        card.style.display = 'none';
+        return;
+      }
+
+      const hasProfile = !!profile.fullName;
+      if (!hasProfile) {
+        heading.textContent = 'Welcome to Wealth Clarity 👋';
+        body.innerHTML = "You've taken the first step toward seeing your money clearly — and that clarity is where real wealth-building begins. Let's set up your financial picture together, so your time with Adeola is spent on strategy, not paperwork.";
+      } else {
+        heading.textContent = `Welcome back, ${firstName} 👋`;
+        body.innerHTML = "Every entry you track is a step toward your goals. Keep going — small, consistent moves are exactly how financial freedom gets built.";
+      }
+      card.style.display = 'block';
+    }
+
+    function dismissWelcome() {
+      safeSetItem('wc_welcome_dismissed', 'true');
+      document.getElementById('welcomeCard').style.display = 'none';
+    }
+
+    // ── Persistent getting-started checklist ─────────────────────────────
+    // Steps auto-complete from real signals (profile saved, entries imported
+    // by source). Retires itself once all four are done.
+    function renderChecklist() {
+      const list = document.getElementById('onboardingChecklist');
+      if (safeGetItem('wc_checklist_done') === 'true') {
+        list.style.display = 'none';
+        return;
+      }
+
+      const done = {
+        profile: !!profile.fullName,
+        statement: entries.some(e => e.source === 'statement'),
+        receipt: entries.some(e => e.source === 'receipt'),
+        share: safeGetItem('wc_shared_once') === 'true'
+      };
+
+      setChecklistItem('check_profile', done.profile);
+      setChecklistItem('check_statement', done.statement);
+      setChecklistItem('check_receipt', done.receipt);
+      setChecklistItem('check_share', done.share);
+
+      const count = Object.values(done).filter(Boolean).length;
+      const progress = document.getElementById('checklistProgress');
+
+      if (count === 4) {
+        // All done — congratulate once, then retire the checklist.
+        safeSetItem('wc_checklist_done', 'true');
+        progress.textContent = '🎉 All set! You\'re ready for your advisor meeting.';
+        setTimeout(() => { list.style.display = 'none'; }, 4000);
+      } else {
+        progress.textContent = `${count} of 4 complete`;
+      }
+      list.style.display = 'block';
+    }
+
+    function setChecklistItem(id, isDone) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('done', isDone);
+    }
+
+    // Jump to Settings and open the Import Bank Statement section.
+    function goToImport() {
+      activateTab('settings');
+      setTimeout(() => {
+        const sections = document.querySelectorAll('#settings details.settings-section');
+        sections.forEach(s => {
+          const title = s.querySelector('.settings-summary-title');
+          if (title && /Import Bank Statement|Scan a Receipt/.test(title.textContent)) s.open = true;
+        });
+        const target = Array.from(sections).find(s => {
+          const t = s.querySelector('.settings-summary-title');
+          return t && /Import Bank Statement/.test(t.textContent);
+        });
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+
+    // ── Guided tour (3 steps) ────────────────────────────────────────────
+    const TOUR_STEPS = [
+      { emoji: '👋', title: 'Welcome to Wealth Clarity', body: 'This is your private space to see your whole financial picture — built with Adeola to help you walk into every meeting prepared and confident.' },
+      { emoji: '📸', title: 'Skip the manual typing', body: 'Import a bank statement or snap a receipt, and we\'ll pull out and categorize the spending for you. Less data entry means you\'ll actually keep it up.' },
+      { emoji: '🎯', title: 'See the full picture', body: 'Add your income, assets, and goals in your Profile, then share your snapshot with Adeola. That\'s how your meetings get spent on strategy — not fact-finding.' }
+    ];
+    let tourStep = 0;
+
+    function startTour() {
+      tourStep = 0;
+      document.getElementById('tourOverlay').style.display = 'flex';
+      renderTourStep();
+    }
+
+    function renderTourStep() {
+      const step = TOUR_STEPS[tourStep];
+      document.getElementById('tourEmoji').textContent = step.emoji;
+      document.getElementById('tourTitle').textContent = step.title;
+      document.getElementById('tourBody').textContent = step.body;
+      document.getElementById('tourNextBtn').textContent = tourStep === TOUR_STEPS.length - 1 ? 'Get started' : 'Next';
+      document.getElementById('tourDots').innerHTML = TOUR_STEPS.map((_, i) =>
+        `<div class="tour-dot ${i === tourStep ? 'active' : ''}"></div>`
+      ).join('');
+    }
+
+    function nextTourStep() {
+      if (tourStep < TOUR_STEPS.length - 1) {
+        tourStep++;
+        renderTourStep();
+      } else {
+        finishTour();
+      }
+    }
+
+    function skipTour() { finishTour(); }
+
+    function finishTour() {
+      safeSetItem('wc_tour_done', 'true');
+      document.getElementById('tourOverlay').style.display = 'none';
+      renderWelcome();
+      renderChecklist();
     }
 
     function activateTab(tabName) {
@@ -1721,6 +2123,7 @@
 
           <div class="form-section">
             <h3>🎯 Financial Goals</h3>
+            <label>Goal areas (select all that apply)</label>
             <div class="option-group">
               <div class="option-item"><input type="checkbox" id="goal_wealth" name="goals" value="Build long-term wealth"><label for="goal_wealth">Build long-term wealth</label></div>
               <div class="option-item"><input type="checkbox" id="goal_home" name="goals" value="Save for a home"><label for="goal_home">Save for a home</label></div>
@@ -1728,6 +2131,15 @@
               <div class="option-item"><input type="checkbox" id="goal_income" name="goals" value="Generate passive income"><label for="goal_income">Generate passive income</label></div>
               <div class="option-item"><input type="checkbox" id="goal_education" name="goals" value="Save for education"><label for="goal_education">Save for education</label></div>
             </div>
+
+            <label style="margin-top: 1rem;">Short-term goal <span style="color:#666;">(next 12 months)</span></label>
+            <input type="text" id="goalShortTerm" placeholder="e.g. Build a $5,000 emergency fund">
+
+            <label>Medium-term goal <span style="color:#666;">(1–5 years)</span></label>
+            <input type="text" id="goalMediumTerm" placeholder="e.g. Save a down payment for a home">
+
+            <label>Long-term goal <span style="color:#666;">(5+ years)</span></label>
+            <input type="text" id="goalLongTerm" placeholder="e.g. Retire comfortably by 60">
           </div>
 
           <button class="btn" onclick="saveProfile()" style="width: 100%; margin-bottom: 0.5rem;">💾 Save Profile</button>
@@ -1786,6 +2198,14 @@
             <div style="display: flex; justify-content: space-between;"><span style="color: #999;">Total Liabilities</span><span style="color: #E8A87C; font-weight: bold;">${formatCurrency(totalLiabilities)}</span></div>
           </div>
 
+          ${(profile.goalShortTerm || profile.goalMediumTerm || profile.goalLongTerm) ? `
+          <div class="form-section">
+            <h3>🎯 Goals by Time Horizon</h3>
+            ${profile.goalShortTerm ? `<div style="margin-bottom: 0.6rem;"><span style="color: #999;">Short-term:</span> <span style="color: #E8A87C;">${txt(profile.goalShortTerm)}</span></div>` : ''}
+            ${profile.goalMediumTerm ? `<div style="margin-bottom: 0.6rem;"><span style="color: #999;">Medium-term:</span> <span style="color: #E8A87C;">${txt(profile.goalMediumTerm)}</span></div>` : ''}
+            ${profile.goalLongTerm ? `<div><span style="color: #999;">Long-term:</span> <span style="color: #E8A87C;">${txt(profile.goalLongTerm)}</span></div>` : ''}
+          </div>` : ''}
+
           <button class="btn success" onclick="shareWithAdeola()" style="width: 100%; margin-top: 2rem;">📧 Share with Adeola</button>
         </div>
       `;
@@ -1818,6 +2238,9 @@
         lineOfCredit: parseFloat(document.getElementById('lineOfCredit').value) || 0,
         otherLiabilities: parseFloat(document.getElementById('otherLiabilities').value) || 0,
         goals: goals,
+        goalShortTerm: document.getElementById('goalShortTerm').value,
+        goalMediumTerm: document.getElementById('goalMediumTerm').value,
+        goalLongTerm: document.getElementById('goalLongTerm').value,
         savedDate: new Date().toISOString()
       };
 
@@ -1825,6 +2248,7 @@
       renderProfileTab();
       updateLogView();
       updateHeroGreeting();
+      if (typeof renderWelcome === 'function') { renderWelcome(); renderChecklist(); }
     }
 
     function editProfile() {
@@ -1866,6 +2290,9 @@
             if (checkbox) checkbox.checked = true;
           });
         }
+        if (profile.goalShortTerm) document.getElementById('goalShortTerm').value = profile.goalShortTerm;
+        if (profile.goalMediumTerm) document.getElementById('goalMediumTerm').value = profile.goalMediumTerm;
+        if (profile.goalLongTerm) document.getElementById('goalLongTerm').value = profile.goalLongTerm;
       }
     }
 
@@ -1913,6 +2340,9 @@ NET WORTH: ${money(netWorth)}
 
 FINANCIAL GOALS
 ${goalsText}
+${profile.goalShortTerm ? `Short-term (next 12 months): ${profile.goalShortTerm}` : ''}
+${profile.goalMediumTerm ? `Medium-term (1-5 years): ${profile.goalMediumTerm}` : ''}
+${profile.goalLongTerm ? `Long-term (5+ years): ${profile.goalLongTerm}` : ''}
 
 ---
 Wealth Clarity - A Money Savvy Expense Tracker
@@ -1921,6 +2351,9 @@ Profile saved: ${new Date().toLocaleString()}`;
       const subject = encodeURIComponent(`Financial Profile from ${profile.fullName || 'a Wealth Clarity user'}`);
       const encodedBody = encodeURIComponent(emailBody);
       const mailtoUrl = `mailto:hello@adeolamonofi.com?subject=${subject}&body=${encodedBody}`;
+
+      safeSetItem('wc_shared_once', 'true');
+      if (typeof renderChecklist === 'function') renderChecklist();
 
       // On some mobile browsers/PWAs, assigning window.location for a mailto:
       // silently no-ops if no mail app is registered as the handler. We try
@@ -2427,6 +2860,7 @@ Profile saved: ${new Date().toLocaleString()}`;
       updateLogView();
       updateInsights();
       activateTab('log');
+      if (typeof renderChecklist === 'function') renderChecklist();
       alert(`✓ Imported ${toImport.length} item${toImport.length > 1 ? 's' : ''}. Review moods/categories anytime by clicking Edit on an entry.`);
     }
 
