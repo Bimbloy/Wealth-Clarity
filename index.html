@@ -84,6 +84,67 @@
       margin-bottom: 10px;
     }
 
+    .disclaimer-banner {
+      background: #1a1a2e;
+      border-bottom: 1px solid #E8A87C;
+      padding: 1rem 1.25rem;
+    }
+
+    .disclaimer-banner-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: #c8c8d0;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .disclaimer-banner-inner strong { color: #E8A87C; }
+
+    .disclaimer-dismiss {
+      flex-shrink: 0;
+      background: #E8A87C;
+      color: #0f0f0f;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.85rem;
+      align-self: flex-start;
+    }
+
+    .disclaimer-dismiss:hover { background: #d9976b; }
+
+    .add-entry-card summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .add-entry-card summary::-webkit-details-marker { display: none; }
+    .add-entry-card summary::marker { content: ''; }
+
+    .add-entry-summary-title {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #f0ece4;
+    }
+
+    .add-entry-chevron {
+      color: #E8A87C;
+      font-size: 1rem;
+      transition: transform 0.2s;
+    }
+
+    .add-entry-card[open] .add-entry-chevron {
+      transform: rotate(90deg);
+    }
+
     .hero h1 {
       font-size: 2.5rem;
       margin-bottom: 8px;
@@ -1060,6 +1121,15 @@
     <button class="btn-hero" onclick="scheduleCall()">📅 Schedule a Call with Adeola</button>
   </section>
 
+  <div class="disclaimer-banner" id="disclaimerBanner" style="display: none;">
+    <div class="disclaimer-banner-inner">
+      <div>
+        <strong>Before you start:</strong> Wealth Clarity is a personal tracking tool for informational purposes only. It does not provide financial, investment, tax, or legal advice, and any projections shown are illustrative estimates based on historical averages — not guarantees. All data stays on your device. For advice tailored to your situation, speak with a qualified professional such as Adeola Monofi.
+      </div>
+      <button class="disclaimer-dismiss" onclick="dismissDisclaimer()">Got it</button>
+    </div>
+  </div>
+
   <div class="container">
     <!-- TABS -->
     <div class="tabs">
@@ -1105,8 +1175,12 @@
         </div>
       </div>
 
-      <div class="card">
-        <h2>Add Entry</h2>
+      <details class="card add-entry-card" id="addEntryCard">
+        <summary class="add-entry-summary">
+          <span class="add-entry-summary-title">➕ Add Entry</span>
+          <span class="add-entry-chevron">▸</span>
+        </summary>
+        <div style="margin-top: 1rem;">
         <label>Currency</label>
         <select id="entryCurrency">
           <option value="CAD">🇨🇦 CAD (Canada)</option>
@@ -1149,7 +1223,8 @@
         <input type="hidden" id="entryMood" value="">
 
         <button class="btn" onclick="addEntry()" style="width: 100%;">+ Add Entry</button>
-      </div>
+        </div>
+      </details>
 
       <div class="card">
         <h2>Entries</h2>
@@ -1289,18 +1364,20 @@
 
           <label class="receipt-upload" for="receiptFile">
             <div class="statement-upload-icon">📸</div>
-            <div class="statement-upload-text">Take or choose a photo of a receipt</div>
-            <div class="statement-upload-subtext">Review each item below before they're added to your Log</div>
-            <input type="file" id="receiptFile" accept="image/*" onchange="handleReceiptUpload(event)">
+            <div class="statement-upload-text">Take or choose photo(s) of a receipt</div>
+            <div class="statement-upload-subtext">Select several photos to scan multiple receipts — or a long receipt in sections — in one go</div>
+            <input type="file" id="receiptFile" accept="image/*" multiple onchange="handleReceiptUpload(event)">
           </label>
-          <div style="color: #666; font-size: 0.8rem; margin-bottom: 1rem;">💡 Tip: flatten the receipt, use good lighting, and fill the frame for the most accurate results.</div>
+          <div style="color: #666; font-size: 0.8rem; margin-bottom: 1rem;">💡 Tip: flatten each receipt, use good lighting, and fill the frame for the most accurate results.</div>
+          <div style="color: #666; font-size: 0.8rem; margin-bottom: 1rem;">📱 On a phone: to scan more than one at once, choose <strong>Photo Library</strong> (not the camera) when prompted, then tap to select several. The camera only captures one at a time.</div>
 
           <img id="receiptPreview" class="receipt-preview" alt="Receipt preview">
+          <div id="receiptMultiSummary" style="display: none; color: #E8A87C; text-align: center; margin-bottom: 1rem; font-weight: bold;"></div>
 
           <div id="receiptPreviewControls" style="display: none; margin-bottom: 1rem;">
-            <button type="button" class="btn secondary" onclick="rotateReceiptPreview()" style="width: 100%;">↻ Rotate</button>
-            <button type="button" class="btn success" onclick="confirmScanReceipt()" style="width: 100%;">🔍 Scan This Receipt</button>
-            <button type="button" class="btn secondary" onclick="resetReceiptSelection()" style="width: 100%; margin-bottom: 0;">Choose a Different Photo</button>
+            <button type="button" class="btn secondary" id="receiptRotateBtn" onclick="rotateReceiptPreview()" style="width: 100%;">↻ Rotate</button>
+            <button type="button" class="btn success" id="receiptScanBtn" onclick="confirmScanReceipt()" style="width: 100%;">🔍 Scan This Receipt</button>
+            <button type="button" class="btn secondary" onclick="resetReceiptSelection()" style="width: 100%; margin-bottom: 0;">Choose Different Photo(s)</button>
           </div>
 
           <div class="receipt-scanning" id="receiptScanning">
@@ -1359,7 +1436,7 @@
           <button class="btn" onclick="scheduleCall()" style="width: 100%; margin-bottom: 0.5rem;">📅 Schedule a Call</button>
           <button class="btn success" onclick="shareWithAdeola()" style="width: 100%;">📧 Share with Advisor</button>
           
-          <div class="settings-subtext" style="margin-top: 1rem;"><a class="link-text" href="#">Learn more about advisor disclaimers</a></div>
+          <div class="settings-subtext" style="margin-top: 1rem;">Wealth Clarity is an independent tracking tool. Sharing your profile does not create an advisory relationship, and any information here is for general reference, not personalized financial advice. Speak with a qualified professional before making financial decisions.</div>
         </details>
 
         <!-- DATA & PRIVACY -->
@@ -1537,7 +1614,18 @@
       updateLogView();
       updateInsights();
       updateHeroGreeting();
+
+      // Show the informational disclaimer until the person acknowledges it
+      // once. Stored separately from user data so it survives a data reset.
+      if (safeGetItem('wc_disclaimer_ack') !== 'true') {
+        document.getElementById('disclaimerBanner').style.display = 'block';
+      }
     });
+
+    function dismissDisclaimer() {
+      safeSetItem('wc_disclaimer_ack', 'true');
+      document.getElementById('disclaimerBanner').style.display = 'none';
+    }
 
     function activateTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -1583,12 +1671,12 @@
 
           <div class="form-section">
             <h3>💼 Current Financial Position</h3>
-            <label>Employment Status</label>
+            <label>Employment Status (select all that apply)</label>
             <div class="option-group">
-              <div class="option-item"><input type="radio" id="emp_employed" name="employment" value="Employed"><label for="emp_employed">Employed</label></div>
-              <div class="option-item"><input type="radio" id="emp_selfemployed" name="employment" value="Self-employed"><label for="emp_selfemployed">Self-employed</label></div>
-              <div class="option-item"><input type="radio" id="emp_retired" name="employment" value="Retired"><label for="emp_retired">Retired</label></div>
-              <div class="option-item"><input type="radio" id="emp_student" name="employment" value="Student"><label for="emp_student">Student</label></div>
+              <div class="option-item"><input type="checkbox" id="emp_employed" name="employment" value="Employed"><label for="emp_employed">Employed</label></div>
+              <div class="option-item"><input type="checkbox" id="emp_selfemployed" name="employment" value="Self-employed"><label for="emp_selfemployed">Self-employed</label></div>
+              <div class="option-item"><input type="checkbox" id="emp_retired" name="employment" value="Retired"><label for="emp_retired">Retired</label></div>
+              <div class="option-item"><input type="checkbox" id="emp_student" name="employment" value="Student"><label for="emp_student">Student</label></div>
             </div>
             <label>Monthly Income After Taxes</label>
             <input type="number" id="monthlyIncome" placeholder="0.00" step="0.01" min="0">
@@ -1649,9 +1737,20 @@
     }
 
     function renderProfileTab() {
-      const totalAssets = profile.cashSavings + profile.investmentAccounts + profile.realEstate + profile.vehicles + profile.otherAssets;
-      const totalLiabilities = profile.mortgageBalance + profile.studentLoans + profile.creditCardDebt + profile.vehicleLoans + profile.lineOfCredit + profile.otherLiabilities;
+      // Coerce every field through safe defaults — a profile saved in an
+      // older format (or with blank fields) must never render as NaN or a
+      // blank screen. num() treats missing/undefined as 0; txt() as an em-dash.
+      const num = v => parseFloat(v) || 0;
+      const txt = v => (v === undefined || v === null || v === '') ? '—' : v;
+
+      const totalAssets = num(profile.cashSavings) + num(profile.investmentAccounts) + num(profile.realEstate) + num(profile.vehicles) + num(profile.otherAssets);
+      const totalLiabilities = num(profile.mortgageBalance) + num(profile.studentLoans) + num(profile.creditCardDebt) + num(profile.vehicleLoans) + num(profile.lineOfCredit) + num(profile.otherLiabilities);
       const netWorth = totalAssets - totalLiabilities;
+
+      // employment may be a string (old format) or an array (current) — normalize.
+      const employmentText = Array.isArray(profile.employment)
+        ? (profile.employment.join(', ') || '—')
+        : txt(profile.employment);
 
       document.getElementById('profileSummary').innerHTML = `
         <div class="card">
@@ -1667,18 +1766,18 @@
 
           <div class="form-section">
             <h3>📋 Personal Information</h3>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Name</span><span style="color: #E8A87C; font-weight: bold;">${profile.fullName}</span></div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Email</span><span style="color: #E8A87C; font-weight: bold;">${profile.emailAddress}</span></div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Phone</span><span style="color: #E8A87C; font-weight: bold;">${profile.phoneNumber}</span></div>
-            <div style="display: flex; justify-content: space-between;"><span style="color: #999;">Age</span><span style="color: #E8A87C; font-weight: bold;">${profile.ageRange}</span></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Name</span><span style="color: #E8A87C; font-weight: bold;">${txt(profile.fullName)}</span></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Email</span><span style="color: #E8A87C; font-weight: bold;">${txt(profile.emailAddress)}</span></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Phone</span><span style="color: #E8A87C; font-weight: bold;">${txt(profile.phoneNumber)}</span></div>
+            <div style="display: flex; justify-content: space-between;"><span style="color: #999;">Age</span><span style="color: #E8A87C; font-weight: bold;">${txt(profile.ageRange)}</span></div>
           </div>
 
           <div class="form-section">
             <h3>💼 Current Position</h3>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Employment</span><span style="color: #E8A87C; font-weight: bold;">${profile.employment}</span></div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Monthly Income</span><span style="color: #E8A87C; font-weight: bold;">${formatCurrency(profile.monthlyIncome)}</span></div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Monthly Expenses</span><span style="color: #E8A87C; font-weight: bold;">${formatCurrency(profile.monthlyExpenses)}</span></div>
-            <div style="display: flex; justify-content: space-between;"><span style="color: #999;">Emergency Fund</span><span style="color: #E8A87C; font-weight: bold;">${profile.emergency}</span></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Employment</span><span style="color: #E8A87C; font-weight: bold;">${employmentText}</span></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Monthly Income</span><span style="color: #E8A87C; font-weight: bold;">${formatCurrency(num(profile.monthlyIncome))}</span></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;"><span style="color: #999;">Monthly Expenses</span><span style="color: #E8A87C; font-weight: bold;">${formatCurrency(num(profile.monthlyExpenses))}</span></div>
+            <div style="display: flex; justify-content: space-between;"><span style="color: #999;">Emergency Fund</span><span style="color: #E8A87C; font-weight: bold;">${txt(profile.emergency)}</span></div>
           </div>
 
           <div class="form-section">
@@ -1696,13 +1795,14 @@
 
     function saveProfile() {
       const goals = Array.from(document.querySelectorAll('input[name="goals"]:checked')).map(el => el.value);
+      const employment = Array.from(document.querySelectorAll('input[name="employment"]:checked')).map(el => el.value);
       
       profile = {
         fullName: document.getElementById('fullName').value,
         emailAddress: document.getElementById('emailAddress').value,
         phoneNumber: document.getElementById('phoneNumber').value,
         ageRange: document.getElementById('ageRange').value,
-        employment: document.querySelector('input[name="employment"]:checked')?.value || '',
+        employment: employment,
         monthlyIncome: parseFloat(document.getElementById('monthlyIncome').value) || 0,
         monthlyExpenses: parseFloat(document.getElementById('monthlyExpenses').value) || 0,
         emergency: document.querySelector('input[name="emergency"]:checked')?.value || '',
@@ -1751,8 +1851,11 @@
         document.getElementById('lineOfCredit').value = profile.lineOfCredit;
         document.getElementById('otherLiabilities').value = profile.otherLiabilities;
 
-        if (profile.employment) {
-          document.querySelector(`input[name="employment"][value="${profile.employment}"]`).checked = true;
+        if (profile.employment && profile.employment.length > 0) {
+          profile.employment.forEach(emp => {
+            const checkbox = document.querySelector(`input[name="employment"][value="${emp}"]`);
+            if (checkbox) checkbox.checked = true;
+          });
         }
         if (profile.emergency) {
           document.querySelector(`input[name="emergency"][value="${profile.emergency}"]`).checked = true;
@@ -1767,52 +1870,103 @@
     }
 
     function shareWithAdeola() {
-      const totalAssets = profile.cashSavings + profile.investmentAccounts + profile.realEstate + profile.vehicles + profile.otherAssets;
-      const totalLiabilities = profile.mortgageBalance + profile.studentLoans + profile.creditCardDebt + profile.vehicleLoans + profile.lineOfCredit + profile.otherLiabilities;
+      const num = v => parseFloat(v) || 0;
+      const money = v => formatCurrency(num(v));
+      const totalAssets = num(profile.cashSavings) + num(profile.investmentAccounts) + num(profile.realEstate) + num(profile.vehicles) + num(profile.otherAssets);
+      const totalLiabilities = num(profile.mortgageBalance) + num(profile.studentLoans) + num(profile.creditCardDebt) + num(profile.vehicleLoans) + num(profile.lineOfCredit) + num(profile.otherLiabilities);
       const netWorth = totalAssets - totalLiabilities;
+      const employmentText = Array.isArray(profile.employment) ? (profile.employment.join(', ') || 'Not specified') : (profile.employment || 'Not specified');
+      const goalsText = Array.isArray(profile.goals) ? (profile.goals.join(', ') || 'None selected') : (profile.goals || 'None selected');
 
       const emailBody = `Financial Profile from Wealth Clarity
 
 CLIENT INFORMATION
-Name: ${profile.fullName}
-Email: ${profile.emailAddress}
-Phone: ${profile.phoneNumber}
-Age: ${profile.ageRange}
+Name: ${profile.fullName || '—'}
+Email: ${profile.emailAddress || '—'}
+Phone: ${profile.phoneNumber || '—'}
+Age: ${profile.ageRange || '—'}
 
 CURRENT FINANCIAL POSITION
-Employment: ${profile.employment}
-Monthly Income: ${formatCurrency(profile.monthlyIncome)}
-Monthly Expenses: ${formatCurrency(profile.monthlyExpenses)}
-Emergency Fund: ${profile.emergency}
+Employment: ${employmentText}
+Monthly Income: ${money(profile.monthlyIncome)}
+Monthly Expenses: ${money(profile.monthlyExpenses)}
+Emergency Fund: ${profile.emergency || '—'}
 
 ASSETS
-Cash/Savings: ${formatCurrency(profile.cashSavings)}
-Investments: ${formatCurrency(profile.investmentAccounts)}
-Real Estate: ${formatCurrency(profile.realEstate)}
-Vehicles: ${formatCurrency(profile.vehicles)}
-Other Assets: ${formatCurrency(profile.otherAssets)}
-TOTAL ASSETS: ${formatCurrency(totalAssets)}
+Cash/Savings: ${money(profile.cashSavings)}
+Investments: ${money(profile.investmentAccounts)}
+Real Estate: ${money(profile.realEstate)}
+Vehicles: ${money(profile.vehicles)}
+Other Assets: ${money(profile.otherAssets)}
+TOTAL ASSETS: ${money(totalAssets)}
 
 LIABILITIES
-Mortgage: ${formatCurrency(profile.mortgageBalance)}
-Student Loans: ${formatCurrency(profile.studentLoans)}
-Credit Card Debt: ${formatCurrency(profile.creditCardDebt)}
-Vehicle Loans: ${formatCurrency(profile.vehicleLoans)}
-Line of Credit: ${formatCurrency(profile.lineOfCredit)}
-Other Liabilities: ${formatCurrency(profile.otherLiabilities)}
-TOTAL LIABILITIES: ${formatCurrency(totalLiabilities)}
+Mortgage: ${money(profile.mortgageBalance)}
+Student Loans: ${money(profile.studentLoans)}
+Credit Card Debt: ${money(profile.creditCardDebt)}
+Vehicle Loans: ${money(profile.vehicleLoans)}
+Line of Credit: ${money(profile.lineOfCredit)}
+Other Liabilities: ${money(profile.otherLiabilities)}
+TOTAL LIABILITIES: ${money(totalLiabilities)}
 
-NET WORTH: ${formatCurrency(netWorth)}
+NET WORTH: ${money(netWorth)}
 
 FINANCIAL GOALS
-${profile.goals.join(', ') || 'None selected'}
+${goalsText}
 
 ---
 Wealth Clarity - A Money Savvy Expense Tracker
 Profile saved: ${new Date().toLocaleString()}`;
 
+      const subject = encodeURIComponent(`Financial Profile from ${profile.fullName || 'a Wealth Clarity user'}`);
       const encodedBody = encodeURIComponent(emailBody);
-      window.location.href = `mailto:hello@adeolamonofi.com?subject=Financial Profile from ${profile.fullName}&body=${encodedBody}`;
+      const mailtoUrl = `mailto:hello@adeolamonofi.com?subject=${subject}&body=${encodedBody}`;
+
+      // On some mobile browsers/PWAs, assigning window.location for a mailto:
+      // silently no-ops if no mail app is registered as the handler. We try
+      // the standard approach first, then offer a copy-to-clipboard fallback
+      // so the person is never left with a button that "does nothing".
+      try {
+        window.location.href = mailtoUrl;
+      } catch (err) {
+        console.error('mailto failed:', err);
+      }
+
+      // After a short delay, offer the manual fallback. If the mail app did
+      // open, the person has left this screen and won't see the prompt; if
+      // nothing happened, this gives them a way forward.
+      setTimeout(() => {
+        if (confirm('If your email app didn\'t open, tap OK to copy your profile summary so you can paste it into an email or message to Adeola manually.')) {
+          copyProfileToClipboard(emailBody);
+        }
+      }, 800);
+    }
+
+    function copyProfileToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(
+          () => alert('✓ Profile summary copied. Adeola\'s email: hello@adeolamonofi.com'),
+          () => fallbackCopy(text)
+        );
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        alert('✓ Profile summary copied. Adeola\'s email: hello@adeolamonofi.com');
+      } catch (err) {
+        alert('Please copy your profile manually and email it to hello@adeolamonofi.com');
+      }
+      document.body.removeChild(ta);
     }
 
     // LOG TAB FUNCTIONS
@@ -1891,7 +2045,11 @@ Profile saved: ${new Date().toLocaleString()}`;
       currentMood = entry.mood;
       document.getElementById('entryMood').value = entry.mood;
 
-      window.scrollTo(0, 0);
+      // Make sure the (now collapsible) entry form is open, then bring it
+      // into view — editing shouldn't dump the person at a collapsed card.
+      const addCard = document.getElementById('addEntryCard');
+      addCard.open = true;
+      addCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function deleteEntry(id) {
@@ -2288,15 +2446,16 @@ Profile saved: ${new Date().toLocaleString()}`;
     // cloud OCR on faded/handwritten receipts, but fully private.
     // ==========================================================
 
-    // State for the photo currently staged for scanning — the user can
-    // rotate it before committing, since a crooked/sideways photo is one
-    // of the biggest causes of poor OCR results.
-    let pendingReceiptFile = null;
+    // State for the photo(s) currently staged for scanning. Rotation only
+    // applies when exactly one photo is selected — with multiple photos,
+    // rotating each individually would add a lot of UI complexity for a
+    // secondary case, so the tip to shoot them right-side-up covers it.
+    let pendingReceiptFiles = [];
     let pendingReceiptRotation = 0;
 
     function handleReceiptUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+      const files = Array.from(event.target.files || []);
+      if (files.length === 0) return;
 
       const errorBox = document.getElementById('receiptError');
       const rawTextWrap = document.getElementById('receiptRawTextWrap');
@@ -2304,39 +2463,57 @@ Profile saved: ${new Date().toLocaleString()}`;
       rawTextWrap.style.display = 'none';
       document.getElementById('receiptScanning').classList.remove('show');
 
-      pendingReceiptFile = file;
+      pendingReceiptFiles = files;
       pendingReceiptRotation = 0;
 
       const preview = document.getElementById('receiptPreview');
-      preview.src = URL.createObjectURL(file);
-      preview.classList.add('show');
+      const multiSummary = document.getElementById('receiptMultiSummary');
+      const rotateBtn = document.getElementById('receiptRotateBtn');
+      const scanBtn = document.getElementById('receiptScanBtn');
+
+      if (files.length === 1) {
+        preview.src = URL.createObjectURL(files[0]);
+        preview.classList.add('show');
+        multiSummary.style.display = 'none';
+        rotateBtn.style.display = 'block';
+        scanBtn.textContent = '🔍 Scan This Receipt';
+      } else {
+        preview.classList.remove('show');
+        multiSummary.textContent = `📸 ${files.length} photos selected`;
+        multiSummary.style.display = 'block';
+        rotateBtn.style.display = 'none';
+        scanBtn.textContent = `🔍 Scan ${files.length} Photos`;
+      }
+
       document.getElementById('receiptPreviewControls').style.display = 'block';
     }
 
     function resetReceiptSelection() {
-      pendingReceiptFile = null;
+      pendingReceiptFiles = [];
       pendingReceiptRotation = 0;
       document.getElementById('receiptFile').value = '';
       document.getElementById('receiptPreview').classList.remove('show');
+      document.getElementById('receiptMultiSummary').style.display = 'none';
       document.getElementById('receiptPreviewControls').style.display = 'none';
       document.getElementById('receiptError').classList.remove('show');
       document.getElementById('receiptRawTextWrap').style.display = 'none';
     }
 
-    // Used after a successful scan — clears the staged photo but leaves the
-    // raw-text debug panel visible, since we just populated it.
+    // Used after a successful scan — clears the staged photo(s) but leaves
+    // the raw-text debug panel visible, since we just populated it.
     function clearPendingReceiptOnly() {
-      pendingReceiptFile = null;
+      pendingReceiptFiles = [];
       pendingReceiptRotation = 0;
       document.getElementById('receiptFile').value = '';
       document.getElementById('receiptPreview').classList.remove('show');
+      document.getElementById('receiptMultiSummary').style.display = 'none';
       document.getElementById('receiptPreviewControls').style.display = 'none';
     }
 
     async function rotateReceiptPreview() {
-      if (!pendingReceiptFile) return;
+      if (pendingReceiptFiles.length !== 1) return;
       pendingReceiptRotation = (pendingReceiptRotation + 90) % 360;
-      const dataUrl = await rotateImageToDataUrl(pendingReceiptFile, pendingReceiptRotation);
+      const dataUrl = await rotateImageToDataUrl(pendingReceiptFiles[0], pendingReceiptRotation);
       document.getElementById('receiptPreview').src = dataUrl;
     }
 
@@ -2435,7 +2612,7 @@ Profile saved: ${new Date().toLocaleString()}`;
     }
 
     async function confirmScanReceipt() {
-      if (!pendingReceiptFile) return;
+      if (pendingReceiptFiles.length === 0) return;
 
       const errorBox = document.getElementById('receiptError');
       const scanning = document.getElementById('receiptScanning');
@@ -2455,19 +2632,57 @@ Profile saved: ${new Date().toLocaleString()}`;
         return;
       }
 
-      try {
-        const rotatedDataUrl = pendingReceiptRotation === 0
-          ? null
-          : await rotateImageToDataUrl(pendingReceiptFile, pendingReceiptRotation);
-        const processedImage = await preprocessReceiptImage(rotatedDataUrl || pendingReceiptFile);
-        await scanReceipt(processedImage);
-      } catch (err) {
-        console.error('Receipt preprocessing failed:', err);
-        scanning.classList.remove('show');
-        document.getElementById('receiptPreviewControls').style.display = 'block';
-        errorBox.textContent = '✗ Could not prepare that image for scanning: ' + err.message;
-        errorBox.classList.add('show');
+      const total = pendingReceiptFiles.length;
+      let combinedItems = [];
+      let combinedRawText = '';
+      const failures = [];
+
+      for (let i = 0; i < total; i++) {
+        const file = pendingReceiptFiles[i];
+        try {
+          // Rotation only applies when a single photo was selected — see
+          // the note on pendingReceiptRotation above.
+          const rotation = total === 1 ? pendingReceiptRotation : 0;
+          const rotatedDataUrl = rotation === 0 ? null : await rotateImageToDataUrl(file, rotation);
+          const processedImage = await preprocessReceiptImage(rotatedDataUrl || file);
+          const result = await scanOneReceiptImage(processedImage, i + 1, total);
+
+          combinedItems = combinedItems.concat(result.items);
+          combinedRawText += (combinedRawText ? '\n\n' : '') + (total > 1 ? `--- Photo ${i + 1} of ${total} ---\n` : '') + result.rawText;
+        } catch (err) {
+          console.error(`Receipt scan failed on photo ${i + 1}:`, err);
+          failures.push({ index: i + 1, message: err.message });
+        }
       }
+
+      scanning.classList.remove('show');
+
+      if (combinedItems.length === 0) {
+        document.getElementById('receiptPreviewControls').style.display = 'block';
+        errorBox.textContent = total > 1
+          ? `✗ Couldn't read any of the ${total} photos. Try clearer, well-lit shots, or add entries manually below.`
+          : '✗ Couldn\'t detect any text on that receipt. Try rotating it, a clearer well-lit photo, or add entries manually below.';
+        errorBox.classList.add('show');
+        return;
+      }
+
+      if (combinedRawText) {
+        document.getElementById('receiptRawText').textContent = combinedRawText;
+        document.getElementById('receiptRawTextWrap').style.display = 'block';
+      }
+
+      const mismatchBox = document.getElementById('receiptSumMismatchNote');
+      if (failures.length > 0) {
+        mismatchBox.textContent = `⚠️ ${failures.length} of ${total} photos couldn't be read — the rest are ready to review below. Check the Totals tab for a per-photo breakdown of what matched.`;
+        mismatchBox.classList.add('show');
+      } else {
+        mismatchBox.classList.remove('show');
+      }
+
+      combinedItems = flagPossibleDuplicates(combinedItems);
+      parsedTransactions = combinedItems;
+      renderTransactionReview();
+      clearPendingReceiptOnly();
     }
 
     // Reuses one Tesseract worker across a session instead of reloading the
@@ -2559,13 +2774,15 @@ Profile saved: ${new Date().toLocaleString()}`;
       return { matched, itemSum, expectedTotal: totalInfo.amount, isSubtotal: totalInfo.isSubtotal, warning };
     }
 
-    async function scanReceipt(imageBlob) {
-      const scanning = document.getElementById('receiptScanning');
+    // Does OCR + parsing + validation for ONE photo and returns its items —
+    // it does not touch parsedTransactions or render anything, so the
+    // multi-photo loop above can call this once per photo and merge the
+    // results into a single combined review list.
+    async function scanOneReceiptImage(imageBlob, photoIndex, photoTotal) {
       const scanningText = document.getElementById('receiptScanningText');
       const progressFill = document.getElementById('receiptProgressFill');
-      const errorBox = document.getElementById('receiptError');
+      const label = photoTotal > 1 ? ` (photo ${photoIndex}/${photoTotal})` : '';
 
-      scanning.classList.add('show');
       progressFill.style.width = '0%';
 
       // Safety net: if OCR hangs (can happen if the browser blocks the
@@ -2575,72 +2792,44 @@ Profile saved: ${new Date().toLocaleString()}`;
         setTimeout(() => reject(new Error('Timed out. This usually means the browser blocked a background download the scanner needs — try opening this file directly in Safari/Chrome rather than an in-app preview, and check your connection.')), 45000)
       );
 
-      try {
-        const result = await Promise.race([
-          runOcr(imageBlob, (m) => {
-            if (m.status === 'recognizing text' && m.progress != null) {
-              const pct = Math.round(m.progress * 100);
-              progressFill.style.width = pct + '%';
-              scanningText.textContent = `⏳ Reading your receipt... ${pct}%`;
-            } else if (m.status) {
-              scanningText.textContent = '⏳ ' + m.status.charAt(0).toUpperCase() + m.status.slice(1) + '...';
-            }
-          }),
-          timeout
-        ]);
+      const result = await Promise.race([
+        runOcr(imageBlob, (m) => {
+          if (m.status === 'recognizing text' && m.progress != null) {
+            const pct = Math.round(m.progress * 100);
+            progressFill.style.width = pct + '%';
+            scanningText.textContent = `⏳ Reading your receipt${label}... ${pct}%`;
+          } else if (m.status) {
+            scanningText.textContent = '⏳ ' + m.status.charAt(0).toUpperCase() + m.status.slice(1) + `...${label}`;
+          }
+        }),
+        timeout
+      ]);
 
-        scanning.classList.remove('show');
-        const rawText = result.data.text || '';
-
-        if (!rawText.trim()) {
-          document.getElementById('receiptPreviewControls').style.display = 'block';
-          errorBox.textContent = '✗ Couldn\'t detect any text on that receipt. Try rotating it, a clearer well-lit photo, or add entries manually below.';
-          errorBox.classList.add('show');
-          return;
-        }
-
-        document.getElementById('receiptRawText').textContent = rawText;
-        document.getElementById('receiptRawTextWrap').style.display = 'block';
-
-        // Try splitting the receipt into individual purchased items first
-        // (e.g. "Pepperoni Pizza" → Food, "Jump Pass" → Entertainment).
-        // If that finds nothing usable, fall back to a single line item
-        // for the whole receipt so the user still has something to review.
-        let items = parseReceiptLineItems(rawText);
-        if (items.length === 0) items = [singleItemFallback(rawText)];
-        items = flagPossibleDuplicates(items);
-
-        const check = checkReceiptSumAgainstTotal(rawText, items);
-        const mismatchBox = document.getElementById('receiptSumMismatchNote');
-        if (check.warning) {
-          mismatchBox.textContent = check.warning;
-          mismatchBox.classList.add('show');
-        } else {
-          mismatchBox.classList.remove('show');
-        }
-
-        logImportCheck({
-          id: Date.now() + Math.floor(Math.random() * 1000),
-          scannedAt: new Date().toISOString(),
-          itemCount: items.length,
-          itemSum: check.itemSum,
-          expectedTotal: check.expectedTotal,
-          isSubtotal: check.isSubtotal,
-          matched: check.matched
-        });
-
-        parsedTransactions = items;
-        renderTransactionReview();
-        clearPendingReceiptOnly();
-      } catch (err) {
-        console.error('Receipt scan failed:', err);
-        scanning.classList.remove('show');
-        document.getElementById('receiptPreviewControls').style.display = 'block';
-        errorBox.textContent = '✗ ' + err.message;
-        errorBox.classList.add('show');
+      const rawText = result.data.text || '';
+      if (!rawText.trim()) {
+        throw new Error(`No text detected${label}`);
       }
-    }
 
+      // Try splitting the receipt into individual purchased items first
+      // (e.g. "Pepperoni Pizza" → Food, "Jump Pass" → Entertainment).
+      // If that finds nothing usable, fall back to a single line item
+      // for the whole receipt so the user still has something to review.
+      let items = parseReceiptLineItems(rawText);
+      if (items.length === 0) items = [singleItemFallback(rawText)];
+
+      const check = checkReceiptSumAgainstTotal(rawText, items);
+      logImportCheck({
+        id: Date.now() + Math.floor(Math.random() * 1000) + photoIndex,
+        scannedAt: new Date().toISOString(),
+        itemCount: items.length,
+        itemSum: check.itemSum,
+        expectedTotal: check.expectedTotal,
+        isSubtotal: check.isSubtotal,
+        matched: check.matched
+      });
+
+      return { items, rawText, check };
+    }
     // Converts a matched amount token to a number. The regex below requires
     // a literal separator (comma or period) before the final 2 digits — so
     // this only ever receives things shaped like "3.49" or "3,49", never a
@@ -2859,9 +3048,49 @@ Profile saved: ${new Date().toLocaleString()}`;
       const moodHtml = Object.entries(MOODS).map(([key, label]) => {
         const count = moodCounts[key];
         const pct = entries.length > 0 ? ((count / entries.length) * 100).toFixed(0) : 0;
-        return `<div class="insight-row"><span class="insight-label">${label}</span><span class="insight-value">${count} (${pct}%)</span></div>`;
+        const clickable = count > 0 ? `onclick="toggleMoodTransactions('${key}')" style="cursor: pointer;"` : '';
+        const chevron = count > 0 ? `<span class="mood-chevron" id="moodChevron_${key}" style="color:#666; margin-left:0.5rem;">▸</span>` : '';
+        return `
+          <div class="insight-row mood-row" ${clickable}>
+            <span class="insight-label">${label}${chevron}</span>
+            <span class="insight-value">${count} (${pct}%)</span>
+          </div>
+          <div class="mood-transactions" id="moodTxns_${key}" style="display: none;"></div>
+        `;
       }).join('');
       document.getElementById('moodBreakdown').innerHTML = moodHtml || '<div style="color: #999;">No entries yet</div>';
+    }
+
+    // Expand/collapse the list of transactions that fall under a given mood.
+    // Restores the earlier behavior where a mood was a drill-down, not just
+    // a count.
+    function toggleMoodTransactions(moodKey) {
+      const container = document.getElementById('moodTxns_' + moodKey);
+      const chevron = document.getElementById('moodChevron_' + moodKey);
+      if (!container) return;
+
+      if (container.style.display === 'block') {
+        container.style.display = 'none';
+        if (chevron) chevron.textContent = '▸';
+        return;
+      }
+
+      const matching = entries.filter(e => e.mood === moodKey);
+      if (matching.length === 0) return;
+
+      container.innerHTML = matching.map(e => {
+        const cur = e.currency || 'CAD';
+        const cat = CATEGORIES[e.category] || e.category || 'Other';
+        return `
+          <div style="display: flex; justify-content: space-between; padding: 0.5rem 0.75rem; border-bottom: 1px solid #2a2a2a; font-size: 0.9rem;">
+            <span style="color: #ccc;">${(e.description || '—')} <span style="color:#666;">· ${cat} · ${e.date || ''}</span></span>
+            <span style="color: #E8A87C; white-space: nowrap; margin-left: 0.75rem;">${formatCurrency(e.amount, cur)}</span>
+          </div>
+        `;
+      }).join('');
+
+      container.style.display = 'block';
+      if (chevron) chevron.textContent = '▾';
     }
 
     // TOTALS TAB — reconciliation history from receipt scans
@@ -2954,7 +3183,7 @@ Profile saved: ${new Date().toLocaleString()}`;
       csv += `Email,${data.profile.emailAddress || ''}\n`;
       csv += `Phone,${data.profile.phoneNumber || ''}\n`;
       csv += `Age Range,${data.profile.ageRange || ''}\n`;
-      csv += `Employment,${data.profile.employment || ''}\n`;
+      csv += `Employment,${(data.profile.employment || []).join('; ')}\n`;
       csv += `Monthly Income,${data.profile.monthlyIncome || 0}\n`;
       csv += `Monthly Expenses,${data.profile.monthlyExpenses || 0}\n`;
       csv += `Hourly Wage,${data.wage || 0}\n\n`;
@@ -3000,7 +3229,7 @@ Profile saved: ${new Date().toLocaleString()}`;
         ['Email', profile.emailAddress || ''],
         ['Phone', profile.phoneNumber || ''],
         ['Age Range', profile.ageRange || ''],
-        ['Employment', profile.employment || ''],
+        ['Employment', (profile.employment || []).join(', ')],
         ['', ''],
         ['Monthly Income', profile.monthlyIncome || 0],
         ['Monthly Expenses', profile.monthlyExpenses || 0],
