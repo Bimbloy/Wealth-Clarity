@@ -84,7 +84,7 @@
       margin-bottom: 10px;
     }
 
-    .disclaimer-gate {
+    .disclaimer-gate, .access-gate {
       position: fixed;
       inset: 0;
       z-index: 2000;
@@ -95,6 +95,8 @@
       padding: 1.5rem;
       overflow-y: auto;
     }
+
+    .access-gate { z-index: 2100; }
 
     .disclaimer-gate-card {
       background: #0f0f0f;
@@ -1322,6 +1324,18 @@
 </head>
 <body>
   <!-- HERO SECTION -->
+  <div class="access-gate" id="accessGate" style="display: none;">
+    <div class="disclaimer-gate-card">
+      <div class="disclaimer-gate-brand">Wealth Clarity</div>
+      <div class="disclaimer-gate-sub">in partnership with Adeola Monofi · The Money Universe</div>
+      <h2>Enter your access code</h2>
+      <p>This is a private tool for Adeola's clients. Please enter the access code she shared with you to continue.</p>
+      <input type="text" id="accessCodeInput" placeholder="Access code" autocomplete="off" style="width: 100%; padding: 0.9rem; font-size: 1rem; border-radius: 6px; border: 1px solid #444; background: #1a1a1a; color: #f0ece4; margin-bottom: 0.5rem; text-align: center; letter-spacing: 2px;">
+      <div id="accessCodeError" style="color: #dc2626; font-size: 0.85rem; min-height: 1.2rem; margin-bottom: 0.5rem;"></div>
+      <button class="disclaimer-gate-btn" onclick="checkAccessCode()">Continue</button>
+    </div>
+  </div>
+
   <div class="disclaimer-gate" id="disclaimerGate" style="display: none;">
     <div class="disclaimer-gate-card">
       <div class="disclaimer-gate-brand">Wealth Clarity</div>
@@ -1821,6 +1835,22 @@
       'bad': '😞 Could do better'
     };
 
+    // Escapes user-entered text before it's placed into the page via
+    // innerHTML. Prevents a description/name/goal containing HTML (e.g.
+    // "<img onerror=...>") from being interpreted as markup and running
+    // code in the user's own browser. Defense-in-depth: there's no server
+    // or other users to attack, but for a finance app this is the right
+    // baseline. Call this on ANY user-controlled string before templating.
+    function escapeHtml(value) {
+      if (value === undefined || value === null) return '';
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function formatCurrency(value, currency = 'CAD') {
       const num = parseFloat(value) || 0;
       return currency + ' $' + num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -1919,7 +1949,39 @@
     // First-ever visit: full-page disclaimer gate → guided tour → checklist.
     // Returning visits: no gate/tour; a short welcome-back + the checklist
     // (until all steps are done, then it retires itself).
+    // ── Soft access gate ─────────────────────────────────────────────────
+    // A light "members-only" gate for Adeola's clients. HONEST LIMITATION:
+    // because this is a browser app, the code below is visible to anyone who
+    // views the page source — this is a speed bump and an exclusivity signal,
+    // NOT real security. It stops casual/accidental access; it does not stop
+    // a determined technical user. Real access control would require a server
+    // (see the security notes). Once entered correctly, we remember it so the
+    // person isn't re-prompted every visit.
+    const ACCESS_CODE = 'MONEYUNIVERSE';  // change per advisor; share with clients
+
     function initOnboarding() {
+      if (safeGetItem('wc_access_granted') !== 'true') {
+        document.getElementById('accessGate').style.display = 'flex';
+        const input = document.getElementById('accessCodeInput');
+        input.addEventListener('keydown', e => { if (e.key === 'Enter') checkAccessCode(); });
+        return; // don't show disclaimer/tour until access is granted
+      }
+      continueAfterAccess();
+    }
+
+    function checkAccessCode() {
+      const entered = (document.getElementById('accessCodeInput').value || '').trim().toUpperCase();
+      const errorEl = document.getElementById('accessCodeError');
+      if (entered === ACCESS_CODE) {
+        safeSetItem('wc_access_granted', 'true');
+        document.getElementById('accessGate').style.display = 'none';
+        continueAfterAccess();
+      } else {
+        errorEl.textContent = 'That code doesn\'t match. Please check with Adeola.';
+      }
+    }
+
+    function continueAfterAccess() {
       const gateAccepted = safeGetItem('wc_disclaimer_ack') === 'true';
       if (!gateAccepted) {
         document.getElementById('disclaimerGate').style.display = 'flex';
@@ -2206,7 +2268,7 @@
       // older format (or with blank fields) must never render as NaN or a
       // blank screen. num() treats missing/undefined as 0; txt() as an em-dash.
       const num = v => parseFloat(v) || 0;
-      const txt = v => (v === undefined || v === null || v === '') ? '—' : v;
+      const txt = v => (v === undefined || v === null || v === '') ? '—' : escapeHtml(v);
 
       const totalAssets = num(profile.cashSavings) + num(profile.investmentAccounts) + num(profile.realEstate) + num(profile.vehicles) + num(profile.otherAssets);
       const totalLiabilities = num(profile.mortgageBalance) + num(profile.studentLoans) + num(profile.creditCardDebt) + num(profile.vehicleLoans) + num(profile.lineOfCredit) + num(profile.otherLiabilities);
@@ -2214,7 +2276,7 @@
 
       // employment may be a string (old format) or an array (current) — normalize.
       const employmentText = Array.isArray(profile.employment)
-        ? (profile.employment.join(', ') || '—')
+        ? (profile.employment.map(escapeHtml).join(', ') || '—')
         : txt(profile.employment);
 
       document.getElementById('profileSummary').innerHTML = `
@@ -2836,8 +2898,8 @@ Profile saved: ${new Date().toLocaleString()}`;
           <input type="checkbox" ${t.selected ? 'checked' : ''} onchange="toggleTxnSelected('${t.tempId}', this.checked)">
           <div class="txn-fields">
             ${t.possibleDuplicate ? '<div class="txn-dupe-badge">⚠️ Possible duplicate — same date &amp; amount as an existing entry</div>' : ''}
-            <input type="text" class="txn-desc-input" value="${t.description.replace(/"/g, '&quot;')}" onchange="updateTxnField('${t.tempId}', 'description', this.value)">
-            <input type="date" class="txn-date-input" value="${t.date}" onchange="updateTxnField('${t.tempId}', 'date', this.value)">
+            <input type="text" class="txn-desc-input" value="${escapeHtml(t.description)}" onchange="updateTxnField('${t.tempId}', 'description', this.value)">
+            <input type="date" class="txn-date-input" value="${escapeHtml(t.date)}" onchange="updateTxnField('${t.tempId}', 'date', this.value)">
             <input type="number" step="0.01" value="${t.amount}" onchange="updateTxnField('${t.tempId}', 'amount', this.value)">
             <select onchange="updateTxnField('${t.tempId}', 'category', this.value)">${categoryOptions.replace(`value="${t.category}"`, `value="${t.category}" selected`)}</select>
           </div>
@@ -3467,10 +3529,10 @@ Profile saved: ${new Date().toLocaleString()}`;
         return `
         <div class="entry-item">
           <div class="entry-header">
-            <div class="entry-description">${e.description}</div>
-            <div class="entry-amount">${e.currency} $${e.amount.toFixed(2)}</div>
+            <div class="entry-description">${escapeHtml(e.description)}</div>
+            <div class="entry-amount">${escapeHtml(e.currency)} $${e.amount.toFixed(2)}</div>
           </div>
-          <div class="entry-meta">${CATEGORIES[e.category]} • ${e.date}${e.source === 'statement' ? ' • 📄 From statement' : ''}</div>
+          <div class="entry-meta">${CATEGORIES[e.category] || escapeHtml(e.category)} • ${escapeHtml(e.date)}${e.source === 'statement' ? ' • 📄 From statement' : ''}</div>
           <div class="entry-mood">${MOODS[e.mood] || MOODS['neutral']}</div>
           <div class="entry-investment">5yr: $${investment.invest5.toFixed(2)} | 10yr: $${investment.invest10.toFixed(2)}</div>
           <div class="entry-actions">
@@ -3567,10 +3629,10 @@ Profile saved: ${new Date().toLocaleString()}`;
 
       container.innerHTML = matching.map(e => {
         const cur = e.currency || 'CAD';
-        const cat = CATEGORIES[e.category] || e.category || 'Other';
+        const cat = CATEGORIES[e.category] || escapeHtml(e.category) || 'Other';
         return `
           <div style="display: flex; justify-content: space-between; padding: 0.5rem 0.75rem; border-bottom: 1px solid #2a2a2a; font-size: 0.9rem;">
-            <span style="color: #ccc;">${(e.description || '—')} <span style="color:#666;">· ${cat} · ${e.date || ''}</span></span>
+            <span style="color: #ccc;">${escapeHtml(e.description) || '—'} <span style="color:#666;">· ${cat} · ${escapeHtml(e.date) || ''}</span></span>
             <span style="color: #E8A87C; white-space: nowrap; margin-left: 0.75rem;">${formatCurrency(e.amount, cur)}</span>
           </div>
         `;
