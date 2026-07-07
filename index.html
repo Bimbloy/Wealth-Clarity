@@ -760,6 +760,14 @@
       padding-bottom: 0;
     }
 
+    .cat-row, .mood-row {
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+    .cat-row:hover, .mood-row:hover {
+      background: #242424;
+    }
+
     .insight-label {
       color: #999;
     }
@@ -1529,6 +1537,12 @@
             <span class="insight-label">Hours of Work</span>
             <span class="insight-value" id="insightHoursOfWork">—</span>
           </div>
+        </div>
+
+        <div class="insights-box">
+          <h3>🗂️ Spending by Category</h3>
+          <p style="color: #999; margin-bottom: 1rem; font-size: 0.9rem;">Tap a category to see the items that make it up.</p>
+          <div id="categoryBreakdown"></div>
         </div>
 
         <div class="insights-box">
@@ -3589,6 +3603,45 @@ Profile saved: ${new Date().toLocaleString()}`;
         document.getElementById('invest10yr').textContent = invest10Str;
       }
 
+      // Spending by category — grouped by category, and within each category
+      // grouped by currency (so mixed-currency users see honest per-currency
+      // totals rather than a blended number). Each row drills down to its
+      // items, matching the mood-breakdown pattern.
+      const catTotals = {};   // category -> { currency -> sum }
+      const catCounts = {};   // category -> count
+      entries.forEach(e => {
+        const c = e.category || 'other';
+        const cur = e.currency || 'CAD';
+        if (!catTotals[c]) catTotals[c] = {};
+        catTotals[c][cur] = (catTotals[c][cur] || 0) + e.amount;
+        catCounts[c] = (catCounts[c] || 0) + 1;
+      });
+
+      // Sort categories by their total spend (largest first). For sorting
+      // across mixed currencies we just sum the raw amounts — ordering only,
+      // never shown as a blended figure.
+      const sortedCats = Object.keys(catTotals).sort((a, b) => {
+        const sumA = Object.values(catTotals[a]).reduce((s, v) => s + v, 0);
+        const sumB = Object.values(catTotals[b]).reduce((s, v) => s + v, 0);
+        return sumB - sumA;
+      });
+
+      const catHtml = sortedCats.map(cat => {
+        const label = CATEGORIES[cat] || escapeHtml(cat) || 'Other';
+        const count = catCounts[cat];
+        const amountStr = Object.keys(catTotals[cat])
+          .map(cur => formatCurrency(catTotals[cat][cur], cur))
+          .join(' + ');
+        return `
+          <div class="insight-row cat-row" onclick="toggleCategoryTransactions('${escapeHtml(cat)}')" style="cursor: pointer;">
+            <span class="insight-label">${label} <span style="color:#666;">(${count})</span><span class="cat-chevron" id="catChevron_${escapeHtml(cat)}" style="color:#666; margin-left:0.5rem;">▸</span></span>
+            <span class="insight-value">${amountStr}</span>
+          </div>
+          <div class="cat-transactions" id="catTxns_${escapeHtml(cat)}" style="display: none;"></div>
+        `;
+      }).join('');
+      document.getElementById('categoryBreakdown').innerHTML = catHtml || '<div style="color: #999;">No entries yet</div>';
+
       const moodCounts = { 'worth-it': 0, 'good': 0, 'neutral': 0, 'regret': 0, 'bad': 0 };
       entries.forEach(e => {
         if (moodCounts.hasOwnProperty(e.mood)) moodCounts[e.mood]++;
@@ -3642,7 +3695,39 @@ Profile saved: ${new Date().toLocaleString()}`;
       if (chevron) chevron.textContent = '▾';
     }
 
-    // TOTALS TAB — reconciliation history from receipt scans
+    // Expand/collapse the items that make up a given category's spend.
+    // Same drill-down pattern as the mood breakdown — Tobi's requested
+    // feature: click "Entertainment" and see what actually constituted it.
+    function toggleCategoryTransactions(categoryKey) {
+      const container = document.getElementById('catTxns_' + categoryKey);
+      const chevron = document.getElementById('catChevron_' + categoryKey);
+      if (!container) return;
+
+      if (container.style.display === 'block') {
+        container.style.display = 'none';
+        if (chevron) chevron.textContent = '▸';
+        return;
+      }
+
+      // Newest first, so the most recent spending in that category is on top.
+      const matching = entries
+        .filter(e => (e.category || 'other') === categoryKey)
+        .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      if (matching.length === 0) return;
+
+      container.innerHTML = matching.map(e => {
+        const cur = e.currency || 'CAD';
+        return `
+          <div style="display: flex; justify-content: space-between; padding: 0.5rem 0.75rem; border-bottom: 1px solid #2a2a2a; font-size: 0.9rem;">
+            <span style="color: #ccc;">${escapeHtml(e.description) || '—'} <span style="color:#666;">· ${escapeHtml(e.date) || ''}</span></span>
+            <span style="color: #E8A87C; white-space: nowrap; margin-left: 0.75rem;">${formatCurrency(e.amount, cur)}</span>
+          </div>
+        `;
+      }).join('');
+
+      container.style.display = 'block';
+      if (chevron) chevron.textContent = '▾';
+    }
     function renderTotalsTab() {
       const emptyState = document.getElementById('totalsEmptyState');
       const list = document.getElementById('totalsList');
